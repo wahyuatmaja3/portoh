@@ -312,19 +312,63 @@ navLinks.forEach((link) => {
     const navbarHeight = navbar?.offsetHeight || 0;
 
     if (isDesktop()) {
-      // Horizontal scroll for desktop
+      // Horizontal scroll for desktop with custom smooth animation
       const targetLeft = targetEl.offsetLeft - navbarHeight - 12;
-      window.scrollTo({
-        left: Math.max(targetLeft, 0),
-        behavior: "smooth",
-      });
+      const startLeft = window.scrollX;
+      const distance = Math.max(targetLeft, 0) - startLeft;
+      const duration = 800; // 800ms animation
+      let startTime = null;
+
+      function animateScroll(currentTime) {
+        if (!startTime) startTime = currentTime;
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // Easing function (ease-in-out-cubic)
+        const easeProgress = progress < 0.5
+          ? 4 * progress * progress * progress
+          : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+        window.scrollTo({
+          left: startLeft + (distance * easeProgress),
+          behavior: 'auto'
+        });
+
+        if (progress < 1) {
+          requestAnimationFrame(animateScroll);
+        }
+      }
+
+      requestAnimationFrame(animateScroll);
     } else {
-      // Vertical scroll for mobile/portrait
+      // Vertical scroll for mobile/portrait with custom smooth animation
       const targetTop = targetEl.offsetTop - navbarHeight - 12;
-      window.scrollTo({
-        top: Math.max(targetTop, 0),
-        behavior: "smooth",
-      });
+      const startTop = window.scrollY;
+      const distance = Math.max(targetTop, 0) - startTop;
+      const duration = 800;
+      let startTime = null;
+
+      function animateScroll(currentTime) {
+        if (!startTime) startTime = currentTime;
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // Easing function (ease-in-out-cubic)
+        const easeProgress = progress < 0.5
+          ? 4 * progress * progress * progress
+          : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+        window.scrollTo({
+          top: startTop + (distance * easeProgress),
+          behavior: 'auto'
+        });
+
+        if (progress < 1) {
+          requestAnimationFrame(animateScroll);
+        }
+      }
+
+      requestAnimationFrame(animateScroll);
     }
   });
 });
