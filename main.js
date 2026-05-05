@@ -16,12 +16,18 @@ window.addEventListener("scroll", () => {
 });
 
 /* =============================================
-   HORIZONTAL SCROLL SETUP
+   HORIZONTAL SCROLL SETUP (Desktop only)
    ============================================= */
 const scrollContainer = document.querySelector('body');
 let isScrolling = false;
 
+function isDesktop() {
+  return window.innerWidth > 768 && window.matchMedia('(orientation: landscape)').matches;
+}
+
 window.addEventListener('wheel', (e) => {
+  if (!isDesktop()) return; // Skip horizontal scroll on mobile/portrait
+
   if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
     e.preventDefault();
     window.scrollBy({
@@ -304,11 +310,39 @@ navLinks.forEach((link) => {
 
     event.preventDefault();
     const navbarHeight = navbar?.offsetHeight || 0;
-    const targetLeft = targetEl.offsetLeft - navbarHeight - 12;
 
-    window.scrollTo({
-      left: Math.max(targetLeft, 0),
-      behavior: "smooth",
-    });
+    if (isDesktop()) {
+      // Horizontal scroll for desktop
+      const targetLeft = targetEl.offsetLeft - navbarHeight - 12;
+      window.scrollTo({
+        left: Math.max(targetLeft, 0),
+        behavior: "smooth",
+      });
+    } else {
+      // Vertical scroll for mobile/portrait
+      const targetTop = targetEl.offsetTop - navbarHeight - 12;
+      window.scrollTo({
+        top: Math.max(targetTop, 0),
+        behavior: "smooth",
+      });
+    }
   });
+});
+
+/* =============================================
+   HANDLE ORIENTATION/RESIZE CHANGES
+   ============================================= */
+let resizeTimeout;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
+    // Reset scroll position when switching between modes
+    window.scrollTo({ top: 0, left: 0 });
+  }, 250);
+});
+
+window.addEventListener('orientationchange', () => {
+  setTimeout(() => {
+    window.scrollTo({ top: 0, left: 0 });
+  }, 300);
 });

@@ -195,11 +195,19 @@ strong {
     font-size: 14px;
     font-weight: 500;
     color: var(--text-muted);
-    transition: color var(--transition);
+    transition:
+        color var(--transition),
+        transform 0.2s ease-in;
+    display: inline-block;
 }
 
 .nav-links a:hover {
     color: var(--text);
+}
+
+.nav-links a:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease-in;
 }
 
 .nav-cta {
@@ -220,6 +228,13 @@ strong {
 .nav-cta:hover {
     opacity: 0.85;
     transform: translateY(-1px);
+}
+
+.nav-cta:active {
+    transform: scale(0.95) translateY(0);
+    transition:
+        transform 0.1s ease-in,
+        opacity 0.1s ease-in;
 }
 
 /* =============================================
@@ -1188,8 +1203,29 @@ body.case-study-open {
 }
 
 @media (max-width: 768px) {
+    html {
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    body {
+        flex-direction: column;
+        width: 100vw;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
     section {
         padding: 80px 40px;
+        min-width: 100vw;
+        width: 100vw;
+        min-height: auto;
+        border-left: none;
+        border-top: 1px solid var(--border);
+    }
+
+    section:first-of-type {
+        border-top: none;
     }
 
     #navbar {
@@ -1210,5 +1246,72 @@ body.case-study-open {
 
     .case-study-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+/* Portrait orientation - force vertical scroll */
+@media (max-width: 768px) and (orientation: portrait) {
+    html {
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    body {
+        flex-direction: column;
+        width: 100vw;
+        min-height: 100vh;
+        height: auto;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    section {
+        min-height: auto;
+        height: auto;
+        overflow-y: visible;
+    }
+
+    #hero {
+        min-height: 100vh;
+        height: auto;
+    }
+
+    footer {
+        position: relative;
+        width: 100%;
+        border-radius: 0;
+        border-left: none;
+        border-top: 1px solid var(--border);
+    }
+
+    .footer-inner {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+}
+
+/* Landscape mobile - keep horizontal scroll */
+@media (max-width: 768px) and (orientation: landscape) {
+    html {
+        overflow-y: hidden;
+        overflow-x: hidden;
+    }
+
+    body {
+        flex-direction: row;
+        width: max-content;
+        overflow: hidden;
+    }
+
+    section {
+        min-width: 100vw;
+        height: 100vh;
+        border-left: 1px solid var(--border);
+        border-top: none;
+    }
+
+    section:first-of-type {
+        border-left: none;
     }
 }

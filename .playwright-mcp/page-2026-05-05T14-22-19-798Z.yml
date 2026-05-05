@@ -1,0 +1,216 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e5]: Loading...
+  - navigation [ref=e6]:
+    - generic [ref=e7]: WTA.
+    - list [ref=e8]:
+      - listitem [ref=e9]:
+        - link "Home" [ref=e10] [cursor=pointer]:
+          - /url: "#hero"
+      - listitem [ref=e11]:
+        - link "About" [ref=e12] [cursor=pointer]:
+          - /url: "#about"
+      - listitem [ref=e13]:
+        - link "Skills" [ref=e14] [cursor=pointer]:
+          - /url: "#skills"
+      - listitem [ref=e15]:
+        - link "Projects" [ref=e16] [cursor=pointer]:
+          - /url: "#projects"
+      - listitem [ref=e17]:
+        - link "Contact" [ref=e18] [cursor=pointer]:
+          - /url: "#contact"
+    - button "Get in Touch" [ref=e19] [cursor=pointer]
+  - generic [ref=e21]:
+    - generic [ref=e22]: Available for work
+    - heading "Wahyu Tri Atmaja" [level=1] [ref=e24]
+    - paragraph [ref=e25]: Mobile & Desktop Developer
+    - paragraph [ref=e26]: 3 years of professional experience building mobile apps with Flutter and maintaining desktop systems with Delphi. Based in Surabaya, Indonesia.
+    - generic [ref=e27]:
+      - button "View Projects" [ref=e28] [cursor=pointer]:
+        - text: View Projects
+        - img [ref=e29]
+      - link "GitHub" [ref=e31] [cursor=pointer]:
+        - /url: https://github.com/wahyuatmaja3
+        - img [ref=e32]
+        - text: GitHub
+  - generic [ref=e34]:
+    - generic [ref=e35]:
+      - generic [ref=e36]: // About Me
+      - heading "Who Am I?" [level=2] [ref=e37]
+    - generic [ref=e38]:
+      - generic [ref=e39]:
+        - paragraph [ref=e40]: Mobile & Desktop Developer dari Surabaya dengan 3+ tahun pengalaman profesional.
+        - paragraph [ref=e41]:
+          - text: Saya fokus pada pengembangan aplikasi mobile menggunakan
+          - strong [ref=e42]: Flutter
+          - text: dan maintenance sistem desktop dengan
+          - strong [ref=e43]: Delphi
+          - text: . Passionate tentang clean code dan user experience.
+      - generic [ref=e44]:
+        - generic [ref=e45]:
+          - generic [ref=e46]: 3+
+          - text: Years Experience
+        - generic [ref=e47]:
+          - generic [ref=e48]: "19"
+          - text: GitHub Repos
+        - generic [ref=e49]:
+          - generic [ref=e50]: "2"
+          - text: Active Roles
+  - generic [ref=e51]:
+    - generic [ref=e52]:
+      - generic [ref=e53]: // Skills
+      - heading "Tech Stack" [level=2] [ref=e54]
+    - generic [ref=e55]:
+      - generic [ref=e56]:
+        - heading "Languages" [level=3] [ref=e57]
+        - generic [ref=e58]:
+          - generic [ref=e59]:
+            - generic [ref=e60]: 🎯
+            - generic [ref=e61]: Dart
+          - generic [ref=e64]:
+            - generic [ref=e65]: ☕
+            - generic [ref=e66]: Java
+          - generic [ref=e69]:
+            - generic [ref=e70]: 🔷
+            - generic [ref=e71]: Pascal
+          - generic [ref=e74]:
+            - generic [ref=e75]: 🐍
+            - generic [ref=e76]: Python
+          - generic [ref=e79]:
+            - generic [ref=e80]: 🚀
+            - generic [ref=e81]: Go
+      - generic [ref=e84]:
+        - heading "Frameworks" [level=3] [ref=e85]
+        - generic [ref=e86]:
+          - generic [ref=e87]:
+            - generic [ref=e88]: 📱
+            - generic [ref=e89]: Flutter
+          - generic [ref=e92]:
+            - generic [ref=e93]: 🖥️
+            - generic [ref=e94]: Delphi 5
+      - generic [ref=e97]:
+        - heading "Tools" [level=3] [ref=e98]
+        - generic [ref=e99]:
+          - generic [ref=e100]:
+            - generic [ref=e101]: 🔧
+            - generic [ref=e102]: Git
+          - generic [ref=e105]:
+            - generic [ref=e106]: 🤖
+            - generic [ref=e107]: Android Studio
+          - generic [ref=e110]:
+            - generic [ref=e111]: 💻
+            - generic [ref=e112]: VS Code
+  - generic [ref=e115]:
+    - generic [ref=e116]:
+      - generic [ref=e117]: // Work
+      - heading "Projects" [level=2] [ref=e118]
+    - generic [ref=e119]:
+      - link "HTML deiji-marketplace A marketplace web application built with HTML. Clean and functional e-commerce solution. HTML CSS E-Commerce" [ref=e120] [cursor=pointer]:
+        - /url: https://github.com/wahyuatmaja3/deiji-marketplace
+        - generic [ref=e121]:
+          - generic [ref=e122]: HTML
+          - img [ref=e123]
+        - heading "deiji-marketplace" [level=3] [ref=e125]
+        - paragraph [ref=e126]: A marketplace web application built with HTML. Clean and functional e-commerce solution.
+        - generic [ref=e127]:
+          - generic [ref=e128]: HTML
+          - generic [ref=e129]: CSS
+          - generic [ref=e130]: E-Commerce
+      - link "PHP kyros Web programming school project. Built to fulfill web development curriculum requirements. PHP Web School Project" [ref=e131] [cursor=pointer]:
+        - /url: https://github.com/wahyuatmaja3/kyros
+        - generic [ref=e132]:
+          - generic [ref=e133]: PHP
+          - img [ref=e134]
+        - heading "kyros" [level=3] [ref=e136]
+        - paragraph [ref=e137]: Web programming school project. Built to fulfill web development curriculum requirements.
+        - generic [ref=e138]:
+          - generic [ref=e139]: PHP
+          - generic [ref=e140]: Web
+          - generic [ref=e141]: School Project
+      - link "Blade figureiie A Laravel Blade project showcasing full-stack web development capabilities. Blade Laravel PHP" [ref=e142] [cursor=pointer]:
+        - /url: https://github.com/wahyuatmaja3/figureiie
+        - generic [ref=e143]:
+          - generic [ref=e144]: Blade
+          - img [ref=e145]
+        - heading "figureiie" [level=3] [ref=e147]
+        - paragraph [ref=e148]: A Laravel Blade project showcasing full-stack web development capabilities.
+        - generic [ref=e149]:
+          - generic [ref=e150]: Blade
+          - generic [ref=e151]: Laravel
+          - generic [ref=e152]: PHP
+      - link "Dart pendaftaran-siswa-smktag Student registration system for SMK TAG, built with Flutter/Dart for efficient enrollment management. Dart Flutter Education" [ref=e153] [cursor=pointer]:
+        - /url: https://github.com/wahyuatmaja3/pendaftaran-siswa-smktag
+        - generic [ref=e154]:
+          - generic [ref=e155]: Dart
+          - img [ref=e156]
+        - heading "pendaftaran-siswa-smktag" [level=3] [ref=e158]
+        - paragraph [ref=e159]: Student registration system for SMK TAG, built with Flutter/Dart for efficient enrollment management.
+        - generic [ref=e160]:
+          - generic [ref=e161]: Dart
+          - generic [ref=e162]: Flutter
+          - generic [ref=e163]: Education
+      - link "JavaScript yakusoku A JavaScript project exploring modern web development patterns and interactions. JavaScript Web" [ref=e164] [cursor=pointer]:
+        - /url: https://github.com/wahyuatmaja3/yakusoku
+        - generic [ref=e165]:
+          - generic [ref=e166]: JavaScript
+          - img [ref=e167]
+        - heading "yakusoku" [level=3] [ref=e169]
+        - paragraph [ref=e170]: A JavaScript project exploring modern web development patterns and interactions.
+        - generic [ref=e171]:
+          - generic [ref=e172]: JavaScript
+          - generic [ref=e173]: Web
+      - link "Featured Dart artha A Flutter/Dart application that has gained community interest with 1 fork. Built for real-world usage. Dart Flutter Mobile" [ref=e174] [cursor=pointer]:
+        - /url: https://github.com/wahyuatmaja3/artha
+        - generic [ref=e175]: Featured
+        - generic [ref=e176]:
+          - generic [ref=e177]: Dart
+          - img [ref=e178]
+        - heading "artha" [level=3] [ref=e180]
+        - paragraph [ref=e181]: A Flutter/Dart application that has gained community interest with 1 fork. Built for real-world usage.
+        - generic [ref=e182]:
+          - generic [ref=e183]: Dart
+          - generic [ref=e184]: Flutter
+          - generic [ref=e185]: Mobile
+    - link "View All 19 Repositories" [ref=e187] [cursor=pointer]:
+      - /url: https://github.com/wahyuatmaja3?tab=repositories
+      - text: View All 19 Repositories
+      - img [ref=e188]
+  - generic [ref=e190]:
+    - generic [ref=e191]:
+      - generic [ref=e192]: // Contact
+      - heading "Let's Build Something Together" [level=2] [ref=e193]:
+        - text: Let's Build
+        - text: Something Together
+      - paragraph [ref=e194]: Whether it's a new mobile app, a web project, or just a chat—I'm always up for it.
+    - generic [ref=e195]:
+      - link "Email wahyusou@gmail.com" [ref=e196] [cursor=pointer]:
+        - /url: mailto:wahyusou@gmail.com
+        - img [ref=e198]
+        - generic [ref=e201]:
+          - generic [ref=e202]: Email
+          - generic [ref=e203]: wahyusou@gmail.com
+        - img [ref=e204]
+      - link "GitHub wahyuatmaja3" [ref=e206] [cursor=pointer]:
+        - /url: https://github.com/wahyuatmaja3
+        - img [ref=e208]
+        - generic [ref=e210]:
+          - generic [ref=e211]: GitHub
+          - generic [ref=e212]: wahyuatmaja3
+        - img [ref=e213]
+      - link "LinkedIn Wahyu Tri Atmaja" [ref=e215] [cursor=pointer]:
+        - /url: https://id.linkedin.com/in/wahyu-tri-atmaja-642207376
+        - img [ref=e217]
+        - generic [ref=e219]:
+          - generic [ref=e220]: LinkedIn
+          - generic [ref=e221]: Wahyu Tri Atmaja
+        - img [ref=e222]
+  - contentinfo [ref=e224]:
+    - generic [ref=e225]:
+      - generic [ref=e226]: WTA.
+      - paragraph [ref=e227]: Designed & Built by Wahyu Tri Atmaja · Surabaya, Indonesia · 2026
+      - generic [ref=e228]:
+        - link "GitHub" [ref=e229] [cursor=pointer]:
+          - /url: https://github.com/wahyuatmaja3
+          - img [ref=e230]
+        - link "Email" [ref=e232] [cursor=pointer]:
+          - /url: mailto:wahyusou@gmail.com
+          - img [ref=e233]
