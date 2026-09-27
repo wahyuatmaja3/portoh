@@ -2,6 +2,13 @@
 
 ## 2026-05-05 - Mobile Portrait Vertical Scroll
 
+> **Superseded.** Entri ini mendokumentasikan layout *horizontal scroll* yang
+> dihapus seluruhnya pada v3 (lihat `THEMES_CHANGELOG.md`). Tidak ada lagi
+> `flex-direction: row` di body, `width: 100vw` per section, maupun handler
+> horizontal wheel di `main.js`. Dipertahankan hanya sebagai catatan sejarah.
+> Untuk daftar perubahan yang masih berlaku, baca `THEMES_CHANGELOG.md` (v4)
+> dan `REDESIGN.md`.
+
 ### Changes Made
 
 #### CSS (style.css)
