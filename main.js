@@ -1,692 +1,2331 @@
-/* =============================================
-   LOADER SCREEN
-   ============================================= */
-window.addEventListener("load", () => {
-  setTimeout(() => {
-    document.getElementById("loader").classList.add("hidden");
-  }, 1200);
-});
-
-/* =============================================
-   NAVBAR SCROLL
-   ============================================= */
-const navbar = document.getElementById("navbar");
-window.addEventListener("scroll", () => {
-  navbar.classList.toggle("scrolled", window.scrollY > 40);
-});
-
-/* =============================================
-   HORIZONTAL SCROLL SETUP (Desktop only)
-   ============================================= */
-const scrollContainer = document.querySelector('body');
-let isScrolling = false;
-
-function isDesktop() {
-  return window.innerWidth > 768 && window.matchMedia('(orientation: landscape)').matches;
-}
-
-let wheelAccumulator = 0;
-let wheelRafId = null;
-
-window.addEventListener('wheel', (e) => {
-  if (!isDesktop()) return; // Skip horizontal scroll on mobile/portrait
-
-  if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
-
-  e.preventDefault();
-  wheelAccumulator += e.deltaY;
-
-  if (wheelRafId !== null) return;
-
-  wheelRafId = requestAnimationFrame(() => {
-    window.scrollBy({
-      left: wheelAccumulator,
-      behavior: 'auto'
-    });
-    wheelAccumulator = 0;
-    wheelRafId = null;
-  });
-}, { passive: false });
-
-/* =============================================
-   INTERACTIVE CASE STUDY MODE
-   ============================================= */
-const caseStudies = {
-  "deiji-marketplace": {
-    title: "deiji-marketplace",
-    summary:
-      "Marketplace web app yang fokus ke experience belanja cepat dengan flow produk, katalog, dan checkout yang sederhana.",
-    problem:
-      "Perlu membangun fondasi e-commerce yang bersih agar mudah dikembangkan, sambil menjaga UI tetap ringan untuk user baru.",
-    solution:
-      "Menyusun struktur halaman dan komponen UI modular, memprioritaskan alur utama browsing produk hingga action pembelian.",
-    stack: ["HTML", "CSS", "E-Commerce"],
-    highlights: [
-      "Struktur halaman modular agar mudah scale",
-      "Visual hierarchy jelas untuk conversion flow",
-      "Interaksi ringan agar performa tetap baik",
-    ],
-    repoUrl: "https://github.com/wahyuatmaja3/deiji-marketplace",
-  },
-  kyros: {
-    title: "kyros",
-    summary:
-      "Project web berbasis PHP yang dibangun untuk kebutuhan pembelajaran sekaligus melatih praktik arsitektur backend dasar.",
-    problem:
-      "Membutuhkan project yang tidak hanya selesai secara fitur, tapi juga tetap rapih untuk proses belajar dan iterasi.",
-    solution:
-      "Menerapkan pola struktur route-view-data sederhana yang mudah dipahami, lalu mengoptimalkan alur CRUD inti.",
-    stack: ["PHP", "Web", "School Project"],
-    highlights: [
-      "CRUD flow end-to-end",
-      "Struktur folder mudah dipahami",
-      "Baseline yang siap dikembangkan",
-    ],
-    repoUrl: "https://github.com/wahyuatmaja3/kyros",
-  },
-  figureiie: {
-    title: "figureiie",
-    summary:
-      "Aplikasi Laravel Blade untuk menunjukkan kapabilitas full-stack web dari sisi rendering server hingga tampilan UI.",
-    problem:
-      "Perlu menyeimbangkan kecepatan delivery dan maintainability pada aplikasi berbasis template server-rendered.",
-    solution:
-      "Memanfaatkan Blade component untuk reuse tampilan, menjaga konsistensi antar halaman, dan mengurangi duplikasi.",
-    stack: ["Blade", "Laravel", "PHP"],
-    highlights: [
-      "Komponen Blade reusable",
-      "Konsistensi desain antarmuka",
-      "Alur pengembangan lebih cepat",
-    ],
-    repoUrl: "https://github.com/wahyuatmaja3/figureiie",
-  },
-  "pendaftaran-siswa-smktag": {
-    title: "pendaftaran-siswa-smktag",
-    summary:
-      "Sistem pendaftaran siswa berbasis Flutter untuk mempermudah proses input dan tracking data enrollment.",
-    problem:
-      "Alur pendaftaran manual rentan lambat dan sulit dipantau ketika jumlah pendaftar meningkat.",
-    solution:
-      "Merancang form, validasi, dan alur data yang terstruktur supaya proses pendaftaran lebih cepat dan minim kesalahan.",
-    stack: ["Dart", "Flutter", "Education"],
-    highlights: [
-      "Form pendaftaran terstruktur",
-      "Alur data lebih konsisten",
-      "UI ramah operator sekolah",
-    ],
-    repoUrl: "https://github.com/wahyuatmaja3/pendaftaran-siswa-smktag",
-  },
-  yakusoku: {
-    title: "yakusoku",
-    summary:
-      "Eksperimen JavaScript untuk mengeksplor pola interaksi modern dan pengalaman pengguna yang lebih hidup.",
-    problem:
-      "Butuh playground untuk mencoba pattern interaksi tanpa overhead framework yang berat.",
-    solution:
-      "Membangun interaksi langsung dengan vanilla JavaScript dan fokus pada transisi yang responsif.",
-    stack: ["JavaScript", "Web"],
-    highlights: [
-      "Interaksi front-end responsif",
-      "Animasi ringan dan halus",
-      "Eksperimen pattern UI modern",
-    ],
-    repoUrl: "https://github.com/wahyuatmaja3/yakusoku",
-  },
-  artha: {
-    title: "artha",
-    summary:
-      "Aplikasi Flutter yang dipakai untuk kebutuhan nyata dan berhasil menarik minat komunitas.",
-    problem:
-      "Membangun app yang tetap stabil untuk penggunaan real-world sambil menjaga kecepatan iterasi fitur.",
-    solution:
-      "Fokus pada pengalaman pengguna inti, optimasi flow penting, dan maintainability agar update bisa berjalan konsisten.",
-    stack: ["Dart", "Flutter", "Mobile"],
-    highlights: [
-      "Dipakai untuk use case nyata",
-      "Iterasi fitur berkelanjutan",
-      "Mendapat respons komunitas",
-    ],
-    repoUrl: "https://github.com/wahyuatmaja3/artha",
-  },
-};
-
-const caseStudyModal = document.getElementById("caseStudyModal");
-const caseStudyClose = document.getElementById("caseStudyClose");
-const caseStudyTitle = document.getElementById("caseStudyTitle");
-const caseStudySummary = document.getElementById("caseStudySummary");
-const caseStudyProblem = document.getElementById("caseStudyProblem");
-const caseStudySolution = document.getElementById("caseStudySolution");
-const caseStudyStack = document.getElementById("caseStudyStack");
-const caseStudyHighlights = document.getElementById("caseStudyHighlights");
-const caseStudyRepo = document.getElementById("caseStudyRepo");
-const caseStudyDemo = document.getElementById("caseStudyDemo");
-
-let activeCaseStudyTrigger = null;
-
-function closeCaseStudyModal() {
-  if (!caseStudyModal || !caseStudyModal.classList.contains("is-open")) return;
-  caseStudyModal.classList.remove("is-open");
-  caseStudyModal.setAttribute("aria-hidden", "true");
-  document.body.classList.remove("case-study-open");
-  if (activeCaseStudyTrigger) {
-    activeCaseStudyTrigger.focus();
-    activeCaseStudyTrigger = null;
-  }
-}
-
-function openCaseStudyModal(triggerEl, data) {
-  if (!caseStudyModal || !data) return;
-
-  caseStudyTitle.textContent = data.title || "Case Study";
-  caseStudySummary.textContent = data.summary || "";
-  caseStudyProblem.textContent = data.problem || "";
-  caseStudySolution.textContent = data.solution || "";
-
-  caseStudyStack.innerHTML = "";
-  (data.stack || []).forEach((item) => {
-    const chip = document.createElement("span");
-    chip.textContent = item;
-    caseStudyStack.appendChild(chip);
-  });
-
-  caseStudyHighlights.innerHTML = "";
-  (data.highlights || []).forEach((item) => {
-    const li = document.createElement("li");
-    li.textContent = item;
-    caseStudyHighlights.appendChild(li);
-  });
-
-  caseStudyRepo.href = data.repoUrl || triggerEl.href;
-
-  if (data.demoUrl) {
-    caseStudyDemo.href = data.demoUrl;
-    caseStudyDemo.style.display = "inline-flex";
-  } else {
-    caseStudyDemo.style.display = "none";
-  }
-
-  activeCaseStudyTrigger = triggerEl;
-  caseStudyModal.classList.add("is-open");
-  caseStudyModal.setAttribute("aria-hidden", "false");
-  document.body.classList.add("case-study-open");
-  caseStudyClose?.focus();
-}
-
-document.querySelectorAll(".project-card").forEach((card) => {
-  card.addEventListener("click", (event) => {
-    const projectId = card.dataset.projectId;
-    const data = caseStudies[projectId];
-    if (!data) return;
-    event.preventDefault();
-    openCaseStudyModal(card, data);
-  });
-});
-
-caseStudyClose?.addEventListener("click", closeCaseStudyModal);
-
-caseStudyModal?.addEventListener("click", (event) => {
-  if (event.target.closest("[data-close-case-study]")) {
-    closeCaseStudyModal();
-  }
-});
-
-window.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") {
-    closeCaseStudyModal();
-  }
-});
-
-/* =============================================
-   INTERSECTION OBSERVER — Reveal & Skill Bars
-   ============================================= */
-const revealEls = document.querySelectorAll(
-  "#about .section-header, .about-grid, #skills .section-header, .skill-category, " +
-    "#projects .section-header, .project-card, #contact .section-header, .contact-card, " +
-    ".stat-item, .card-inner",
-);
-
-revealEls.forEach((el, i) => {
-  el.classList.add("reveal");
-  el.style.transitionDelay = `${(i % 4) * 0.08}s`;
-});
-
-const revealObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("visible");
-      }
-    });
-  },
-  { threshold: 0.12 },
-);
-
-revealEls.forEach((el) => revealObserver.observe(el));
-
-// Animate skill bars
-const barObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.querySelectorAll(".pill-fill").forEach((fill) => {
-          const target = fill.style.width || "0";
-          fill.style.width = "0";
-          requestAnimationFrame(() => {
-            setTimeout(() => {
-              fill.style.width = target;
-            }, 100);
-          });
-        });
-        barObserver.unobserve(entry.target);
-      }
-    });
-  },
-  { threshold: 0.3 },
-);
-
-document
-  .querySelectorAll(".skill-category")
-  .forEach((cat) => barObserver.observe(cat));
-
-/* =============================================
-   ACTIVE NAV LINK ON SCROLL
-   ============================================= */
-const sections = document.querySelectorAll("section[id]");
-const navLinks = document.querySelectorAll(".nav-links a");
-
-const sectionObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        navLinks.forEach((a) => (a.style.color = ""));
-        const activeLink = document.querySelector(
-          `.nav-links a[href="#${entry.target.id}"]`,
-        );
-        if (activeLink) activeLink.style.color = "var(--text)";
-      }
-    });
-  },
-  { threshold: 0.3, rootMargin: "-80px 0px 0px 0px" },
-);
-
-sections.forEach((s) => sectionObserver.observe(s));
-
-navLinks.forEach((link) => {
-  link.addEventListener("click", (event) => {
-    const targetId = link.getAttribute("href");
-    if (!targetId || !targetId.startsWith("#")) return;
-
-    const targetEl = document.querySelector(targetId);
-    if (!targetEl) return;
-
-    event.preventDefault();
-    const navbarHeight = navbar?.offsetHeight || 0;
-
-    if (isDesktop()) {
-      // Horizontal scroll for desktop with custom smooth animation
-      const targetLeft = targetEl.offsetLeft - navbarHeight - 12;
-      const startLeft = window.scrollX;
-      const distance = Math.max(targetLeft, 0) - startLeft;
-      const duration = 800; // 800ms animation
-      let startTime = null;
-
-      function animateScroll(currentTime) {
-        if (!startTime) startTime = currentTime;
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-
-        // Easing function (ease-in-out-cubic)
-        const easeProgress = progress < 0.5
-          ? 4 * progress * progress * progress
-          : 1 - Math.pow(-2 * progress + 2, 3) / 2;
-
-        window.scrollTo({
-          left: startLeft + (distance * easeProgress),
-          behavior: 'auto'
-        });
-
-        if (progress < 1) {
-          requestAnimationFrame(animateScroll);
-        }
-      }
-
-      requestAnimationFrame(animateScroll);
-    } else {
-      // Vertical scroll for mobile/portrait with custom smooth animation
-      const targetTop = targetEl.offsetTop - navbarHeight - 12;
-      const startTop = window.scrollY;
-      const distance = Math.max(targetTop, 0) - startTop;
-      const duration = 800;
-      let startTime = null;
-
-      function animateScroll(currentTime) {
-        if (!startTime) startTime = currentTime;
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-
-        // Easing function (ease-in-out-cubic)
-        const easeProgress = progress < 0.5
-          ? 4 * progress * progress * progress
-          : 1 - Math.pow(-2 * progress + 2, 3) / 2;
-
-        window.scrollTo({
-          top: startTop + (distance * easeProgress),
-          behavior: 'auto'
-        });
-
-        if (progress < 1) {
-          requestAnimationFrame(animateScroll);
-        }
-      }
-
-      requestAnimationFrame(animateScroll);
-    }
-  });
-});
-
-/* =============================================
-   HANDLE ORIENTATION/RESIZE CHANGES
-   ============================================= */
-let resizeTimeout;
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimeout);
-  resizeTimeout = setTimeout(() => {
-    // Reset scroll position when switching between modes
-    window.scrollTo({ top: 0, left: 0 });
-  }, 250);
-});
-
-window.addEventListener('orientationchange', () => {
-  setTimeout(() => {
-    window.scrollTo({ top: 0, left: 0 });
-  }, 300);
-});
-
-/* =============================================
-   THEME SWITCHER — built programmatically
-   ============================================= */
+/* =============================================================================
+   PORTOH — main.js
+   Vanilla port of interactive patterns from ObsidianUI + Bencho.
+   No dependencies, no build step.
+   ========================================================================== */
 (function () {
-  const THEMES = [
-    { id: 'default',      emoji: '\u26A1', label: 'Default'       },
-    { id: 'neobrutalism', emoji: '\u2B1B', label: 'Neobrutalism'  },
-    { id: 'y2k',          emoji: '\uD83D\uDCBF', label: 'Y2K Retro'     },
-    { id: 'acid',         emoji: '\uD83E\uDDEA', label: 'Acid/Cyberpunk' },
-    { id: 'maximalism',   emoji: '\uD83D\uDCA5', label: 'Maximalism'     },
-    { id: 'bento',        emoji: '\uD83C\uDF71', label: 'Vibrant Bento'  },
-  ];
+    "use strict";
 
-  const savedTheme = localStorage.getItem('portoh-theme') || 'default';
-  document.body.setAttribute('data-theme', savedTheme);
+    var root = document.documentElement;
+    var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-  // Build the widget
-  const switcher = document.createElement('div');
-  switcher.id = 'theme-switcher';
-  // Inline styles so nothing can override or hide it
-  switcher.style.cssText = [
-    'position:fixed',
-    'bottom:24px',
-    'left:24px',
-    'display:flex',
-    'gap:6px',
-    'align-items:center',
-    'background:rgba(255,255,255,0.96)',
-    'padding:8px',
-    'border-radius:99px',
-    'border:1px solid rgba(0,0,0,0.14)',
-    'box-shadow:0 4px 20px rgba(0,0,0,0.18)',
-    'z-index:2147483647',
-    'backdrop-filter:blur(16px)',
-    '-webkit-backdrop-filter:blur(16px)',
-  ].join(';');
-
-  THEMES.forEach(({ id, emoji, label }) => {
-    const btn = document.createElement('button');
-    btn.setAttribute('data-theme-id', id);
-    btn.setAttribute('title', label);
-    btn.setAttribute('aria-label', label);
-    btn.textContent = emoji;
-    btn.style.cssText = [
-      'background:transparent',
-      'border:none',
-      'font-size:20px',
-      'width:36px',
-      'height:36px',
-      'display:flex',
-      'align-items:center',
-      'justify-content:center',
-      'border-radius:50%',
-      'cursor:pointer',
-      'transition:all 0.15s ease',
-      'opacity:0.55',
-      'flex-shrink:0',
-      'line-height:1',
-    ].join(';');
-
-    if (id === savedTheme) {
-      btn.style.opacity = '1';
-      btn.style.background = 'rgba(0,0,0,0.1)';
-    }
-
-    btn.addEventListener('mouseenter', () => {
-      if (btn.getAttribute('data-theme-id') !== document.body.getAttribute('data-theme')) {
-        btn.style.opacity = '1';
-        btn.style.transform = 'scale(1.15)';
-      }
-    });
-    btn.addEventListener('mouseleave', () => {
-      if (btn.getAttribute('data-theme-id') !== document.body.getAttribute('data-theme')) {
-        btn.style.opacity = '0.55';
-        btn.style.transform = 'scale(1)';
-      }
-    });
-
-    btn.addEventListener('click', () => {
-      const theme = btn.getAttribute('data-theme-id');
-      document.body.setAttribute('data-theme', theme);
-      localStorage.setItem('portoh-theme', theme);
-
-      // Update all buttons
-      switcher.querySelectorAll('button').forEach(b => {
-        b.style.opacity = '0.55';
-        b.style.background = 'transparent';
-        b.style.transform = 'scale(1)';
-      });
-      btn.style.opacity = '1';
-      btn.style.background = 'rgba(0,0,0,0.1)';
-    });
-
-    switcher.appendChild(btn);
-  });
-
-  document.body.appendChild(switcher);
-}());
-
-/* =============================================
-   THEME DECORATIONS — fill whitespace per theme
-   ============================================= */
-(function () {
-  const Y2K_IMAGES = [
-    "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/Y2K_illustration.png/500px-Y2K_illustration.png",
-    "https://upload.wikimedia.org/wikipedia/commons/e/e2/Animated_y2k_nightclub_floor.gif",
-    "https://upload.wikimedia.org/wikipedia/commons/7/77/Y2K_Logo.gif",
-    "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/84/Y2K_Forever_%283891157537%29.jpg/500px-Y2K_Forever_%283891157537%29.jpg",
-    "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/93/Y2K_server_%282885614250%29.jpg/500px-Y2K_server_%282885614250%29.jpg",
-    "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/Y2k_Electronics_%283437121387%29.jpg/500px-Y2k_Electronics_%283437121387%29.jpg",
-    "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/11/The_y2k_decade..._%28449369045%29.jpg/500px-The_y2k_decade..._%28449369045%29.jpg",
-    "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9b/Y2K_%2819479517290%29.jpg/500px-Y2K_%2819479517290%29.jpg",
-  ];
-
-  const DOODLES = [
-    '<svg viewBox="0 0 100 100"><path d="M50 8v84M8 50h84" fill="none" stroke="#000" stroke-width="7"/></svg>',
-    '<svg viewBox="0 0 100 100"><path d="M50 4l11 32 34 4-26 22 8 34-27-19-27 19 8-34-26-22 34-4z" fill="#ffeb3b" stroke="#000" stroke-width="4" stroke-linejoin="round"/></svg>',
-    '<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="34" fill="none" stroke="#000" stroke-width="7"/></svg>',
-    '<svg viewBox="0 0 100 100"><path d="M55 6L24 56h18l-6 38 38-52H54z" fill="#448aff" stroke="#000" stroke-width="4" stroke-linejoin="round"/></svg>',
-    '<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#000" stroke-width="6"/><circle cx="36" cy="42" r="5" fill="#000"/><circle cx="64" cy="42" r="5" fill="#000"/><path d="M32 64c10 12 26 12 36 0" fill="none" stroke="#000" stroke-width="6" stroke-linecap="round"/></svg>',
-    '<svg viewBox="0 0 100 100"><path d="M6 60c14-30 20 30 34 0s20 30 34 0 20 30 20-20" fill="none" stroke="#000" stroke-width="6" stroke-linecap="round"/></svg>',
-    '<svg viewBox="0 0 100 100"><path d="M10 50h62M60 26l22 24-22 24" fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-    '<svg viewBox="0 0 100 100"><path d="M50 50m-6 0a6 6 0 1 0 12 0a6 6 0 1 0-12 0m6 6a14 14 0 1 1 0-28a14 14 0 0 1 0 28m0 6a26 26 0 1 1 0-52a26 26 0 0 1 0 52" fill="none" stroke="#000" stroke-width="6"/></svg>',
-    '<svg viewBox="0 0 100 100"><path d="M50 12l30 66H20z" fill="none" stroke="#000" stroke-width="7" stroke-linejoin="round"/></svg>',
-    '<svg viewBox="0 0 100 100"><path d="M50 88C22 70 12 52 12 38c0-12 9-22 20-22 5 0 10 2 18 10 8-8 13-10 18-10 11 0 20 10 20 22 0 14-10 32-38 50z" fill="#ff5252" stroke="#000" stroke-width="4" stroke-linejoin="round"/></svg>',
-  ];
-
-  const ACID_LINES = [
-    "$ npm run deploy -- --prod\n> deploying... OK",
-    ">_ ./init.sh --theme cyberpunk\n>_ modules loaded [42]",
-    "01001000 01001001 01000111 01001000",
-    ">>> sudo rm -rf /dev/null\n>>> permission granted",
-    "0x7F [OK] 0x00 [OK] 0xDEADBEEF [??]",
-    "...connecting to 198.51.100.7:1337",
-    'LOAD "*",8,1',
-    "MATRIX REV 2.3.1 :: enter the grid",
-    "--=[ access granted ]=--",
-    "pwd :: /home/cyber/net",
-  ];
-
-  const MAX_WORDS = ["WOW!", "COOL", "RAD", "BANG", "POP", "X-TREME", "NEON", "ZOOM", "HELLO", "WILD", "MAX", "FIRE", "STAR", "GO!"];
-
-  const BENTO_COLORS = ["#ff9a9e", "#a18cd1", "#fbc2eb", "#a6c1ee", "#fad0c4", "#84fab0", "#ffd3a5", "#fda085"];
-
-  function mulberry32(seed) {
-    let a = seed >>> 0;
-    return function () {
-      a |= 0;
-      a = (a + 0x6d2b79f5) | 0;
-      let t = Math.imul(a ^ (a >>> 15), 1 | a);
-      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    var clamp = function (v, min, max) {
+        return v < min ? min : v > max ? max : v;
     };
-  }
 
-  function hash(str) {
-    let h = 2166136261;
-    for (let i = 0; i < str.length; i++) {
-      h ^= str.charCodeAt(i);
-      h = Math.imul(h, 16777619);
+    /**
+     * Run a component in isolation so one failing feature cannot take the
+     * rest of the page down with it.
+     */
+    function component(name, fn) {
+        try {
+            fn();
+        } catch (err) {
+            console.error("[portoh] " + name + " failed to initialise:", err);
+        }
     }
-    return h >>> 0;
-  }
 
-  function el(tag, className, style) {
-    const e = document.createElement(tag);
-    if (className) e.className = className;
-    if (style) Object.assign(e.style, style);
-    return e;
-  }
+    /* --------------------------------------------------------------------
+       THEME — two themes, applied to <html data-theme>
+       ------------------------------------------------------------------ */
+    var THEMES = ["obsidian", "prism"];
+    var themeToggle = document.getElementById("themeToggle");
+    var themeToggleState = document.getElementById("themeToggleState");
 
-  function place(e, rng) {
-    e.style.top = (8 + rng() * 78).toFixed(1) + "%";
-    e.style.left = (4 + rng() * 88).toFixed(1) + "%";
-    return e;
-  }
+    function getTheme() {
+        var t = root.getAttribute("data-theme");
+        return THEMES.indexOf(t) === -1 ? "obsidian" : t;
+    }
 
-  function buildNeo(rng) {
-    const tmp = document.createElement("div");
-    tmp.innerHTML = DOODLES[Math.floor(rng() * DOODLES.length)];
-    const svg = tmp.querySelector("svg");
-    const size = Math.round(30 + rng() * 60);
-    svg.setAttribute("width", size);
-    svg.setAttribute("height", size);
-    const e = el("div", "deco");
-    e.appendChild(svg);
-    e.style.transform = "rotate(" + Math.round(-30 + rng() * 60) + "deg)";
-    return e;
-  }
+    function applyTheme(theme) {
+        if (THEMES.indexOf(theme) === -1) return;
+        root.setAttribute("data-theme", theme);
+        try {
+            localStorage.setItem("portoh-theme", theme);
+        } catch (e) {}
 
-  function buildY2k(rng, idx) {
-    const e = el("div", "deco y2k-pic");
-    const img = document.createElement("img");
-    img.src = Y2K_IMAGES[idx % Y2K_IMAGES.length];
-    img.loading = "lazy";
-    img.alt = "";
-    e.appendChild(img);
-    e.style.width = Math.round(90 + rng() * 90) + "px";
-    e.style.transform = "rotate(" + Math.round(-14 + rng() * 28) + "deg)";
-    return e;
-  }
+        var isPrism = theme === "prism";
+        if (themeToggle) {
+            themeToggle.setAttribute("aria-checked", String(isPrism));
+            themeToggle.setAttribute(
+                "aria-label",
+                isPrism ? "Switch to Obsidian theme" : "Switch to Prism theme"
+            );
+        }
+        if (themeToggleState) {
+            themeToggleState.textContent =
+                "Current theme: " + (isPrism ? "Prism" : "Obsidian");
+        }
 
-  function buildAcid(rng) {
-    const e = el("div", "deco acid-line");
-    e.textContent = ACID_LINES[Math.floor(rng() * ACID_LINES.length)];
-    if (rng() < 0.5) e.classList.add("blink");
-    e.style.fontSize = Math.round(11 + rng() * 9) + "px";
-    e.style.transform = "rotate(" + Math.round(-6 + rng() * 12) + "deg)";
-    return e;
-  }
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute("content", isPrism ? "#f4f2ed" : "#08080a");
+    }
 
-  function buildMax(rng) {
-    const e = el("div", "deco max-sticker");
-    e.textContent = MAX_WORDS[Math.floor(rng() * MAX_WORDS.length)];
-    e.style.fontSize = Math.round(20 + rng() * 34) + "px";
-    e.style.transform = "rotate(" + Math.round(-20 + rng() * 40) + "deg)";
-    if (rng() < 0.33) e.style.background = "#00ffcc";
-    else if (rng() < 0.5) e.style.background = "#ff00ff";
-    return e;
-  }
+    if (themeToggle) {
+        themeToggle.addEventListener("click", function () {
+            applyTheme(getTheme() === "obsidian" ? "prism" : "obsidian");
+        });
+    }
 
-  function buildBento(rng) {
-    const e = el("div", "deco bento-blob");
-    const s = Math.round(120 + rng() * 220);
-    e.style.width = s + "px";
-    e.style.height = s + "px";
-    e.style.background = BENTO_COLORS[Math.floor(rng() * BENTO_COLORS.length)];
-    return e;
-  }
+    applyTheme(getTheme());
 
-  const BUILDERS = {
-    default: null,
-    neobrutalism: buildNeo,
-    y2k: buildY2k,
-    acid: buildAcid,
-    maximalism: buildMax,
-    bento: buildBento,
-  };
+    /* --------------------------------------------------------------------
+       PRELOADER — fake progress, then reveal
+       ------------------------------------------------------------------ */
+    component("preloader", function () {
+        var el = document.getElementById("preloader");
+        var counter = document.getElementById("preloaderCount");
+        if (!el) return;
 
-  const COUNTS = {
-    default: 0,
-    neobrutalism: 14,
-    y2k: 4,
-    acid: 10,
-    maximalism: 10,
-    bento: 6,
-  };
+        if (reduceMotion.matches) {
+            el.classList.add("is-done");
+            el.remove();
+            return;
+        }
 
-  function renderDecor(theme) {
-    document.querySelectorAll("body > section").forEach((section) => {
-      let layer = section.querySelector(":scope > .deco-layer");
-      if (!layer) {
-        layer = document.createElement("div");
-        layer.className = "deco-layer";
-        layer.setAttribute("aria-hidden", "true");
-        section.appendChild(layer);
-      }
-      layer.innerHTML = "";
+        var start = performance.now();
+        var DURATION = 900;
+        var shown = 0;
+        var finished = false;
 
-      const build = BUILDERS[theme] || null;
-      const count = COUNTS[theme] || 0;
-      const rng = mulberry32(hash(section.id + "::" + theme));
+        function finish() {
+            if (finished) return;
+            finished = true;
+            counter.textContent = "100";
+            el.classList.add("is-done");
+            document.body.classList.add("is-loaded");
+            window.setTimeout(function () {
+                el.remove();
+            }, 600);
+        }
 
-      for (let i = 0; i < count; i++) {
-        const item = build(rng, i);
-        if (!item) continue;
-        place(item, rng);
-        layer.appendChild(item);
-      }
+        function tick(now) {
+            if (finished) return;
+            // ease-out toward 100 so it never feels like a stalled bar
+            var p = Math.min((now - start) / DURATION, 1);
+            var eased = 1 - Math.pow(1 - p, 2);
+            var target = Math.round(eased * 100);
+            if (target !== shown) {
+                shown = target;
+                counter.textContent = String(shown);
+            }
+            if (p < 1) requestAnimationFrame(tick);
+            else finish();
+        }
+
+        // don't trap the user behind the loader if a resource stalls
+        var failsafe = window.setTimeout(finish, 2600);
+        requestAnimationFrame(tick);
+        window.addEventListener("load", function () {
+            if (performance.now() - start < DURATION) return;
+            window.clearTimeout(failsafe);
+        });
     });
-  }
 
-  function applyDecor() {
-    renderDecor(document.body.getAttribute("data-theme") || "default");
-  }
+    /* --------------------------------------------------------------------
+       SCROLL REVEAL
+       ------------------------------------------------------------------ */
+    component("scroll-reveal", function () {
+        var targets = document.querySelectorAll("[data-reveal]");
+        if (!targets.length) return;
 
-  new MutationObserver(applyDecor).observe(document.body, {
-    attributes: true,
-    attributeFilter: ["data-theme"],
-  });
+        if (reduceMotion.matches || !("IntersectionObserver" in window)) {
+            targets.forEach(function (el) {
+                el.classList.add("is-in");
+            });
+            return;
+        }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", applyDecor);
-  } else {
-    applyDecor();
-  }
-})();
+        var io = new IntersectionObserver(
+            function (entries) {
+                entries.forEach(function (entry) {
+                    if (!entry.isIntersecting) return;
+                    entry.target.classList.add("is-in");
+                    io.unobserve(entry.target);
+                });
+            },
+            { rootMargin: "0px 0px -12% 0px", threshold: 0.1 }
+        );
 
+        targets.forEach(function (el, i) {
+            // gentle cascade inside a single group
+            el.style.transitionDelay = (i % 4) * 60 + "ms";
+            io.observe(el);
+        });
+    });
+
+    /* --------------------------------------------------------------------
+       FLIP TEXT — per-character 3D flip, sine-staggered delay
+       Ported from ObsidianUI flip-text
+       ------------------------------------------------------------------ */
+    component("flip-text", function () {
+        var el = document.querySelector("[data-flip-text]");
+        if (!el) return;
+
+        var text = el.textContent.trim();
+        var DURATION = 1.4; // seconds, drives the stagger window
+        var words = text.split(/\s+/);
+        var totalChars = text.replace(/\s/g, "").length || 1;
+        var cursor = 0;
+
+        el.textContent = "";
+
+        words.forEach(function (word, wi) {
+            var wordEl = document.createElement("span");
+            wordEl.className = "word";
+
+            word.split("").forEach(function (char) {
+                var charEl = document.createElement("span");
+                charEl.className = "flip-char";
+                charEl.textContent = char;
+
+                if (!reduceMotion.matches) {
+                    // sine ramp: first characters flip earliest, then it eases off
+                    var norm = cursor / totalChars;
+                    var delay = Math.sin(norm * (Math.PI / 2)) * (DURATION * 0.25);
+                    charEl.style.setProperty("--flip-delay", delay.toFixed(3) + "s");
+                }
+                cursor++;
+                wordEl.appendChild(charEl);
+            });
+
+            el.appendChild(wordEl);
+            if (wi < words.length - 1) {
+                var space = document.createElement("span");
+                space.className = "word";
+                space.innerHTML = "&nbsp;";
+                space.style.transformStyle = "preserve-3d";
+                el.appendChild(space);
+            }
+        });
+    });
+
+    /* --------------------------------------------------------------------
+       ROLE REEL — cycling job titles
+       ------------------------------------------------------------------ */
+    component("role-reel", function () {
+        var reel = document.querySelector("[data-reel]");
+        var track = reel && reel.querySelector("[data-reel-track]");
+        if (!reel || !track) return;
+
+        if (reduceMotion.matches) {
+            // no animation: show everything stacked, no overflow clipping
+            reel.style.height = "auto";
+            return;
+        }
+
+        var items = Array.prototype.slice.call(track.children);
+        var count = items.length;
+        if (count < 2) return;
+
+        // duplicate the first item so the loop is seamless: the clone sits at
+        // -count steps, which shows the same text as step 0 on the way back round
+        var clone = items[0].cloneNode(true);
+        track.appendChild(clone);
+
+        // the translate step must equal the line box of one item, otherwise the
+        // roll drifts out of sync and clips the titles. CSS owns that ratio in
+        // --reel-line so the clip window and the animation cannot disagree.
+        var step = parseFloat(getComputedStyle(reel).getPropertyValue("--reel-line"));
+        if (!step || isNaN(step)) step = 1.5;
+
+        var HOLD = 1.7; // seconds each title stays put
+        var total = HOLD * count;
+
+        // one stop per item, plus a final hold on the clone
+        var frames = [];
+        for (var i = 0; i <= count; i++) {
+            var translate = "transform:translateY(" + (-i * step).toFixed(4) + "em)";
+            if (i === count) {
+                // the last stop lands exactly on 100%, so a single selector is
+                // enough — emitting both would only duplicate the same value
+                frames.push("100%{" + translate + "}");
+            } else {
+                var startPct = (i / count) * 100;
+                var endPct = startPct + (100 / count) * 0.62;
+                frames.push(
+                    startPct.toFixed(2) + "%," + endPct.toFixed(2) + "%{" + translate + "}"
+                );
+            }
+        }
+
+        var style = document.createElement("style");
+        style.textContent = "@keyframes reel-roll{" + frames.join("") + "}";
+        document.head.appendChild(style);
+
+        // own the whole shorthand so the duration and the keyframes can never
+        // drift apart and leave a gap at the end of the loop
+        track.style.animation =
+            "reel-roll " +
+            total.toFixed(2) +
+            "s cubic-bezier(0.45,0,0.55,1) infinite";
+    });
+
+    /* --------------------------------------------------------------------
+       PROGRESS TICKS — build the segmented level meters
+       Ported from Bencho progress-ticks
+       ------------------------------------------------------------------ */
+    component("progress-ticks", function () {
+        document.querySelectorAll("[data-ticks]").forEach(function (el) {
+            if (el.children.length) return;
+            var total = parseInt(el.getAttribute("data-ticks"), 10) || 5;
+            var filled = parseInt(el.getAttribute("data-filled"), 10) || 0;
+
+            var frag = document.createDocumentFragment();
+            for (var i = 0; i < total; i++) {
+                var tick = document.createElement("span");
+                tick.className = "tick" + (i < filled ? " is-filled" : "");
+                frag.appendChild(tick);
+            }
+            el.appendChild(frag);
+
+            // expose the level to assistive tech, the bars are decorative
+            var skill = el.closest("[data-skill]");
+            if (skill) {
+                var level = skill.getAttribute("data-level");
+                var name = skill.querySelector(".skill__name");
+                if (level && name) {
+                    skill.setAttribute("aria-label", name.textContent + ", level " + level + " out of 100");
+                }
+            }
+        });
+    });
+
+    /* --------------------------------------------------------------------
+       CLICK SPARK
+       Ported from ObsidianUI click-spark
+       ------------------------------------------------------------------ */
+    component("click-spark", function () {
+        var canvas = document.getElementById("clickSpark");
+        if (!canvas) return;
+        if (reduceMotion.matches) return;
+
+        var ctx = canvas.getContext("2d");
+        if (!ctx) return;
+
+        var SPARK_SIZE = 10;
+        var SPARK_RADIUS = 16;
+        var SPARK_COUNT = 8;
+        var DURATION = 400;
+        var sparks = [];
+        var dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+        function resize() {
+            canvas.width = window.innerWidth * dpr;
+            canvas.height = window.innerHeight * dpr;
+            canvas.style.width = "100%";
+            canvas.style.height = "100%";
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        function sparkColor() {
+            // resolved so the spark matches whichever theme is active
+            return getComputedStyle(root).getPropertyValue("--text").trim() || "#fff";
+        }
+
+        function draw(now) {
+            ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+            var color = sparkColor();
+
+            sparks = sparks.filter(function (s) {
+                var elapsed = now - s.start;
+                if (elapsed >= DURATION) return false;
+
+                var p = elapsed / DURATION;
+                var eased = p * (2 - p); // ease-out
+                var dist = eased * SPARK_RADIUS;
+                var len = SPARK_SIZE * (1 - eased);
+
+                var cos = Math.cos(s.angle);
+                var sin = Math.sin(s.angle);
+
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 2;
+                ctx.lineCap = "round";
+                ctx.beginPath();
+                ctx.moveTo(s.x + dist * cos, s.y + dist * sin);
+                ctx.lineTo(s.x + (dist + len) * cos, s.y + (dist + len) * sin);
+                ctx.stroke();
+                return true;
+            });
+
+            requestAnimationFrame(draw);
+        }
+
+        function emit(x, y) {
+            var now = performance.now();
+            for (var i = 0; i < SPARK_COUNT; i++) {
+                sparks.push({
+                    x: x,
+                    y: y,
+                    angle: (2 * Math.PI * i) / SPARK_COUNT,
+                    start: now
+                });
+            }
+        }
+
+        resize();
+        window.addEventListener("resize", resize);
+        document.addEventListener("click", function (e) {
+            emit(e.clientX, e.clientY);
+        });
+        document.addEventListener(
+            "touchstart",
+            function (e) {
+                Array.prototype.forEach.call(e.changedTouches, function (t) {
+                    emit(t.clientX, t.clientY);
+                });
+            },
+            { passive: true }
+        );
+        requestAnimationFrame(draw);
+    });
+
+    /* --------------------------------------------------------------------
+       DRAGGABLE MARQUEE — auto-scroll + drag with inertia
+       Ported from ObsidianUI draggable-marquee (GSAP Draggable -> Pointer Events)
+       ------------------------------------------------------------------ */
+    component("draggable-marquee", function () {
+        var roots = document.querySelectorAll("[data-marquee]");
+        if (!roots.length) return;
+
+        roots.forEach(function (marquee) {
+            var track = marquee.querySelector("[data-marquee-track]");
+            if (!track) return;
+
+            var reverse = marquee.classList.contains("marquee--reverse");
+            var SPEED = 0.55;
+            var THROW_MULTIPLIER = 2.8;
+            var THROW_FRICTION = 0.975;
+            var MAX_THROW = 60;
+            var LOOPS = 3;
+
+            var setWidth = 0;
+            var x = 0;
+            var throwVelocity = 0;
+            var isDragging = false;
+            var isPointerOver = false;
+            var lastX = 0;
+            var lastT = 0;
+            var pointerId = null;
+            var offsetX = 0;
+            var rafId = null;
+
+            function gap() {
+                var s = getComputedStyle(track);
+                return parseFloat(s.columnGap || s.gap || 0) || 0;
+            }
+
+            function wrapMin() {
+                return -setWidth * 1.02;
+            }
+
+            function wrap(v) {
+                var min = wrapMin();
+                var max = 0;
+                var range = max - min;
+                if (!range) return 0;
+                while (v < min) v += range;
+                while (v > max) v -= range;
+                return v;
+            }
+
+            function measure() {
+                var set = track.firstElementChild;
+                if (!set) return;
+
+                // one set + the gap that follows it
+                setWidth = set.getBoundingClientRect().width + gap();
+                if (!setWidth) return;
+
+                var progress = setWidth ? (x - wrapMin()) / (0 - wrapMin()) : 0;
+                x = wrap(wrapMin() + setWidth * (isFinite(progress) ? progress : 0));
+                apply();
+            }
+
+            function apply() {
+                track.style.transform = "translate3d(" + x.toFixed(2) + "px,0,0)";
+            }
+
+            function tick() {
+                if (!isDragging) {
+                    // pause on hover so a chip is readable before the next drag
+                    if (!isPointerOver) {
+                        if (reverse) x += SPEED;
+                        else x -= SPEED;
+                    }
+                    x += throwVelocity;
+                    throwVelocity *= THROW_FRICTION;
+                    if (Math.abs(throwVelocity) < 0.01) throwVelocity = 0;
+                }
+                x = wrap(x);
+                apply();
+                rafId = requestAnimationFrame(tick);
+            }
+
+            function build() {
+                if (reduceMotion.matches) return;
+                var set = track.firstElementChild;
+                if (!set) return;
+                // clone until the track is comfortably wider than the viewport
+                var needed = Math.ceil((marquee.clientWidth * 2) / (set.getBoundingClientRect().width || 1)) + 1;
+                var loops = clamp(needed, LOOPS, 8);
+                for (var i = 1; i < loops; i++) {
+                    var clone = set.cloneNode(true);
+                    // clones are decoration — keep them out of the a11y tree
+                    clone.setAttribute("aria-hidden", "true");
+                    track.appendChild(clone);
+                }
+            }
+
+            if (reduceMotion.matches) {
+                marquee.setAttribute("aria-disabled", "false");
+            } else {
+                build();
+                measure();
+                rafId = requestAnimationFrame(tick);
+            }
+
+            // re-measure on resize / content reflow
+            var resizeRaf = null;
+            function scheduleMeasure() {
+                if (reduceMotion.matches) return;
+                if (resizeRaf) cancelAnimationFrame(resizeRaf);
+                resizeRaf = requestAnimationFrame(measure);
+            }
+            window.addEventListener("resize", scheduleMeasure);
+            if ("ResizeObserver" in window) {
+                var ro = new ResizeObserver(scheduleMeasure);
+                ro.observe(track);
+            }
+
+            marquee.addEventListener("mouseenter", function () {
+                isPointerOver = true;
+            });
+            marquee.addEventListener("mouseleave", function () {
+                isPointerOver = false;
+            });
+
+            // keyboard: page-scroll worth of travel per keypress
+            marquee.addEventListener("keydown", function (e) {
+                if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+                e.preventDefault();
+                var dir = e.key === "ArrowLeft" ? 1 : -1;
+                x = wrap(x + dir * marquee.clientWidth * 0.35);
+                throwVelocity = 0;
+                apply();
+            });
+
+            if (reduceMotion.matches) return;
+
+            marquee.addEventListener("pointerdown", function (e) {
+                if (e.pointerType === "mouse" && e.button !== 0) return;
+                isDragging = true;
+                pointerId = e.pointerId;
+                marquee.setPointerCapture(pointerId);
+                throwVelocity = 0;
+                offsetX = x - e.clientX;
+                lastX = e.clientX;
+                lastT = performance.now();
+                marquee.style.cursor = "grabbing";
+            });
+
+            marquee.addEventListener("pointermove", function (e) {
+                if (!isDragging || e.pointerId !== pointerId) return;
+                e.preventDefault();
+
+                var now = performance.now();
+                x = wrap(e.clientX + offsetX);
+
+                var dt = now - lastT;
+                if (dt > 0) {
+                    var dx = e.clientX - lastX;
+                    var sampled = (dx / dt) * 36.67;
+                    throwVelocity = clamp(
+                        -MAX_THROW,
+                        MAX_THROW,
+                        sampled * THROW_MULTIPLIER
+                    );
+                }
+                apply();
+                lastX = e.clientX;
+                lastT = now;
+            });
+
+            function endDrag(e) {
+                if (!isDragging || (e && e.pointerId !== pointerId)) return;
+                isDragging = false;
+                if (pointerId !== null && marquee.hasPointerCapture(pointerId)) {
+                    marquee.releasePointerCapture(pointerId);
+                }
+                pointerId = null;
+                marquee.style.cursor = "";
+            }
+
+            marquee.addEventListener("pointerup", endDrag);
+            marquee.addEventListener("pointercancel", endDrag);
+            marquee.addEventListener("pointerleave", endDrag);
+        });
+    });
+
+    /* --------------------------------------------------------------------
+       PARTICLES — orbital systems behind the hero
+       Ported from Bencho particles (hover mode), reshaped into a few
+       concentric orrery patterns instead of one random field
+       ------------------------------------------------------------------ */
+    component("particles", function () {
+        var canvas = document.querySelector("[data-particles]");
+        if (!canvas) return;
+
+        var ctx = canvas.getContext("2d");
+        if (!ctx) return;
+
+        var MAX_DPR = 2;
+        var ORBIT_SQUASH = 0.6; // rings read as orbits, not flat circles
+        var CORE_R = 2.6;
+        var PUSH_R = 90; // how far the cursor can shove a body off its orbit
+        var LINK_R = 150; // cursor tether reach
+
+        // ring radius as a share of the system size, and how many bodies sit on
+        // it. The innermost ring carries the fewest, so density falls outward
+        // the way a real system thins out. Inner rings run faster, so the whole
+        // system shears instead of rotating as one rigid disc.
+        var RINGS = [
+            { r: 0.3, n: 5, speed: 1.0, dot: 1.5 },
+            { r: 0.56, n: 8, speed: 0.62, dot: 1.3 },
+            { r: 0.8, n: 10, speed: 0.4, dot: 1.1 },
+            { r: 1.0, n: 13, speed: 0.27, dot: 0.95 }
+        ];
+        var CORE_BODIES = 5;
+
+        var dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
+        var w = 0;
+        var h = 0;
+        var systems = [];
+        var rafId = null;
+        var visible = true;
+        var pointer = { x: 0, y: 0, active: false };
+
+        // resolved on theme change, not per frame — getComputedStyle on every
+        // frame is a forced style recalc and costs more than the drawing does
+        var dot = "#ff7a1a";
+        var line = "rgba(255, 122, 26, 0.34)";
+
+        function readTheme() {
+            var cs = getComputedStyle(root);
+            dot = cs.getPropertyValue("--accent").trim() || "#ff7a1a";
+            line = cs.getPropertyValue("--accent-line").trim() || "rgba(255, 122, 26, 0.34)";
+        }
+
+        /* Centres sit in the band above the headline: that is the only strip
+           that stays clear of hero copy at every viewport measured. The second
+           system takes a side margin. Both are fractions of the hero box, so
+           the pattern holds its shape at any size. */
+        function layout() {
+            var narrow = w / h < 1.1;
+            var m = Math.min(w, h);
+            systems = [];
+
+            if (narrow) {
+                addSystem(0.5, 0.085, m * 0.185, 1);
+                addSystem(0.8, 0.4, m * 0.095, -1);
+            } else {
+                addSystem(0.5, 0.12, m * 0.22, 1);
+                addSystem(0.12, 0.64, m * 0.11, -1);
+            }
+        }
+
+        function addSystem(nx, ny, size, dir) {
+            var sys = {
+                cx: nx * w,
+                cy: ny * h,
+                dir: dir,
+                spin: 0,
+                core: [],
+                rings: []
+            };
+
+            // the central body as a small cluster, so the middle has weight
+            for (var c = 0; c < CORE_BODIES; c++) {
+                sys.core.push({
+                    a: (c / CORE_BODIES) * Math.PI * 2,
+                    d: size * 0.05 * (0.4 + ((c * 7) % 5) / 5),
+                    sp: 0.5 + ((c * 3) % 4) * 0.12,
+                    r: CORE_R * (c === 0 ? 1.5 : 0.62),
+                    ox: 0,
+                    oy: 0,
+                    x: 0,
+                    y: 0,
+                    hx: 0,
+                    hy: 0
+                });
+            }
+
+            for (var i = 0; i < RINGS.length; i++) {
+                var def = RINGS[i];
+                var ring = {
+                    rx: size * def.r,
+                    ry: size * def.r * ORBIT_SQUASH,
+                    speed: def.speed,
+                    angle: Math.random() * Math.PI * 2,
+                    dot: def.dot,
+                    parts: []
+                };
+                for (var n = 0; n < def.n; n++) {
+                    ring.parts.push({
+                        phase: (n / def.n) * Math.PI * 2,
+                        drift: 0.94 + Math.random() * 0.12,
+                        wob: Math.random() * Math.PI * 2,
+                        wx: 0.03 + Math.random() * 0.05,
+                        wy: 0.03 + Math.random() * 0.05,
+                        ox: 0,
+                        oy: 0,
+                        x: 0,
+                        y: 0,
+                        hx: 0,
+                        hy: 0
+                    });
+                }
+                sys.rings.push(ring);
+            }
+            systems.push(sys);
+        }
+
+        function resize() {
+            var rect = canvas.getBoundingClientRect();
+            w = rect.width;
+            h = rect.height;
+            if (!w || !h) return;
+            dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
+            canvas.width = Math.round(w * dpr);
+            canvas.height = Math.round(h * dpr);
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            layout();
+        }
+
+        function draw() {
+            rafId = null;
+            if (!visible) return;
+
+            var animated = !reduceMotion.matches;
+            var i;
+            var j;
+            var k;
+            var s;
+            var ring;
+            var p;
+            var a;
+            var dx;
+            var dy;
+            var d2;
+            var push;
+            var d;
+            var t = 0;
+
+            ctx.clearRect(0, 0, w, h);
+
+            if (animated) {
+                t = performance.now();
+                for (i = 0; i < systems.length; i++) {
+                    systems[i].spin = (t * 0.00016) * systems[i].dir;
+                }
+            }
+
+            // the orbit paths, so the pattern still reads where no body sits
+            ctx.strokeStyle = line;
+            ctx.lineWidth = 1;
+            for (i = 0; i < systems.length; i++) {
+                s = systems[i];
+                for (j = 0; j < s.rings.length; j++) {
+                    ring = s.rings[j];
+                    ctx.globalAlpha = 0.17 - j * 0.024;
+                    ctx.beginPath();
+                    ctx.ellipse(s.cx, s.cy, ring.rx, ring.ry, 0, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+            }
+            ctx.globalAlpha = 1;
+
+            ctx.fillStyle = dot;
+            var pushR2 = PUSH_R * PUSH_R;
+
+            for (i = 0; i < systems.length; i++) {
+                s = systems[i];
+
+                for (j = 0; j < s.rings.length; j++) {
+                    ring = s.rings[j];
+                    if (animated) ring.angle += 0.0034 * ring.speed * s.dir;
+
+                    for (k = 0; k < ring.parts.length; k++) {
+                        p = ring.parts[k];
+                        a = ring.angle + p.phase * p.drift + s.spin * p.drift;
+
+                        // a slow radial wobble keeps a ring from looking like a
+                        // dashed circle, without letting a body leave it
+                        var wob = p.wob + (animated ? t * 0.00055 * p.drift : 0);
+                        var rx = ring.rx * (1 + Math.sin(wob) * p.wx);
+                        var ry = ring.ry * (1 + Math.cos(wob * 1.3) * p.wy);
+
+                        p.hx = s.cx + Math.cos(a) * rx;
+                        p.hy = s.cy + Math.sin(a) * ry;
+
+                        if (animated && pointer.active) {
+                            dx = p.hx - pointer.x;
+                            dy = p.hy - pointer.y;
+                            d2 = dx * dx + dy * dy;
+                            if (d2 < pushR2 && d2 > 0.01) {
+                                d = Math.sqrt(d2);
+                                push = (1 - d / PUSH_R) * 1.6;
+                                p.ox += (dx / d) * push;
+                                p.oy += (dy / d) * push;
+                            }
+                            // spring back to the orbit: the cursor may disturb
+                            // the pattern but never break it
+                            p.ox *= 0.9;
+                            p.oy *= 0.9;
+                        }
+
+                        p.x = p.hx + p.ox;
+                        p.y = p.hy + p.oy;
+
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, ring.dot, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+
+                for (k = 0; k < s.core.length; k++) {
+                    p = s.core[k];
+                    a = p.a + s.spin * p.sp;
+                    p.hx = s.cx + Math.cos(a) * p.d;
+                    p.hy = s.cy + Math.sin(a) * p.d * ORBIT_SQUASH;
+
+                    if (animated && pointer.active) {
+                        dx = p.hx - pointer.x;
+                        dy = p.hy - pointer.y;
+                        d2 = dx * dx + dy * dy;
+                        if (d2 < pushR2 && d2 > 0.01) {
+                            d = Math.sqrt(d2);
+                            push = (1 - d / PUSH_R) * 1.6;
+                            p.ox += (dx / d) * push;
+                            p.oy += (dy / d) * push;
+                        }
+                        p.ox *= 0.9;
+                        p.oy *= 0.9;
+                    }
+
+                    p.x = p.hx + p.ox;
+                    p.y = p.hy + p.oy;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            // tether the nearest bodies to the cursor, so the hover reads as a
+            // response instead of the pattern drifting past untouched
+            if (animated && pointer.active) {
+                ctx.strokeStyle = line;
+                ctx.lineWidth = 1;
+                var linked = 0;
+                var linkR2 = LINK_R * LINK_R;
+                for (i = 0; i < systems.length && linked < 14; i++) {
+                    s = systems[i];
+                    for (j = 0; j < s.rings.length; j++) {
+                        ring = s.rings[j];
+                        for (k = 0; k < ring.parts.length && linked < 14; k++) {
+                            p = ring.parts[k];
+                            dx = p.x - pointer.x;
+                            dy = p.y - pointer.y;
+                            d2 = dx * dx + dy * dy;
+                            if (d2 > linkR2) continue;
+                            d = Math.sqrt(d2);
+                            ctx.globalAlpha = (1 - d / LINK_R) * 0.85;
+                            ctx.beginPath();
+                            ctx.moveTo(p.x, p.y);
+                            ctx.lineTo(pointer.x, pointer.y);
+                            ctx.stroke();
+                            linked++;
+                        }
+                    }
+                }
+                ctx.globalAlpha = 1;
+            }
+
+            if (animated) rafId = requestAnimationFrame(draw);
+        }
+
+        function wake() {
+            if (rafId === null) rafId = requestAnimationFrame(draw);
+        }
+
+        function track(e) {
+            var rect = canvas.getBoundingClientRect();
+            pointer.x = e.clientX - rect.left;
+            pointer.y = e.clientY - rect.top;
+            if (!pointer.active) {
+                pointer.active = true;
+                wake();
+            }
+        }
+
+        resize();
+        readTheme();
+
+        window.addEventListener("resize", function () {
+            resize();
+            wake();
+        });
+
+        window.addEventListener("pointermove", track, { passive: true });
+        window.addEventListener("pointerdown", track, { passive: true });
+        window.addEventListener("pointerleave", function () {
+            pointer.active = false;
+        });
+
+        // the palette is only re-read when the theme attribute actually flips,
+        // so the hot loop never touches getComputedStyle
+        if (window.MutationObserver) {
+            new MutationObserver(readTheme).observe(root, {
+                attributes: true,
+                attributeFilter: ["data-theme"]
+            });
+        }
+
+        // the field covers the whole hero, so stop painting once it scrolls away
+        if ("IntersectionObserver" in window) {
+            var io = new IntersectionObserver(function (entries) {
+                visible = entries[0].isIntersecting;
+                if (visible) wake();
+                else if (rafId !== null) {
+                    cancelAnimationFrame(rafId);
+                    rafId = null;
+                }
+            });
+            io.observe(canvas);
+        }
+
+        if (reduceMotion.matches) {
+            // one static frame: the orrery holds still but is fully drawn
+            pointer.active = false;
+            draw();
+        } else {
+            wake();
+        }
+    });
+
+    /* --------------------------------------------------------------------
+       GLASS BUBBLE — draggable orb with velocity and edge bounce
+       Ported from Bencho glass-bubble
+       ------------------------------------------------------------------ */
+    component("glass-bubble", function () {
+        var bubble = document.querySelector("[data-bubble]");
+        if (!bubble) return;
+
+        // 0.92 decays a full-strength throw to rest in about a second; at 0.94
+        // the orb kept sliding for closer to two, which read as floaty
+        var FRICTION = 0.92;
+        var BOUNCE = 0.55;
+        var MAX_THROW = 24;
+        var SQUASH = 0.55; // how much of the speed becomes deformation
+
+        var x = 0;
+        var y = 0;
+        var vx = 0;
+        var vy = 0;
+        var scaleX = 1;
+        var scaleY = 1;
+        var isDragging = false;
+        var pointerId = null;
+        var lastX = 0;
+        var lastY = 0;
+        var lastT = 0;
+        var grabX = 0;
+        var grabY = 0;
+        var rafId = null;
+        var minX = 0;
+        var minY = 0;
+        var maxX = 0;
+        var maxY = 0;
+
+        function measure() {
+            var host = bubble.offsetParent || bubble.parentNode;
+            if (!host) return;
+
+            var hostRect = host.getBoundingClientRect();
+            var w = bubble.offsetWidth || 1;
+            var h = bubble.offsetHeight || 1;
+
+            // The bubble is parked, not laid out, so its resting spot has to
+            // find genuinely empty space: beside the slide-to-confirm when
+            // there is room for it, otherwise in the section's bottom padding.
+            var anchor = host.querySelector(".slide__track");
+            var restX;
+            var restY;
+
+            if (anchor) {
+                var ar = anchor.getBoundingClientRect();
+                var slot = hostRect.width - (ar.right - hostRect.left) - 24;
+                if (slot >= w + 16) {
+                    restX = ar.right - hostRect.left + 40;
+                    restY = ar.top - hostRect.top + (ar.height - h) / 2;
+                } else {
+                    restX = (hostRect.width - w) / 2;
+                    restY = hostRect.height - h - 12;
+                }
+            } else {
+                restX = (hostRect.width - w) / 2;
+                restY = 12;
+            }
+
+            restX = clamp(restX, 8, Math.max(8, hostRect.width - w - 8));
+            restY = clamp(restY, 8, Math.max(8, hostRect.height - h - 8));
+
+            bubble.style.setProperty("--bubble-left", restX.toFixed(1) + "px");
+            bubble.style.setProperty("--bubble-top", restY.toFixed(1) + "px");
+
+            // x and y are offsets from the resting spot, so the travel limits
+            // have to be expressed in the same space or the bubble escapes the
+            // section. Left and up are capped short so it cannot wander over
+            // the slide-to-confirm text.
+            var pad = 12;
+            var limitX = Math.max(0, hostRect.width - w - pad);
+            var limitY = Math.max(0, hostRect.height - h - pad);
+            minX = -Math.min(restX, 90);
+            minY = -Math.min(restY, 70);
+            maxX = Math.max(minX, limitX - restX);
+            maxY = Math.max(minY, limitY - restY);
+        }
+
+        function apply() {
+            bubble.style.transform =
+                "translate3d(" +
+                x.toFixed(2) +
+                "px," +
+                y.toFixed(2) +
+                "px,0) scale(" +
+                scaleX.toFixed(3) +
+                "," +
+                scaleY.toFixed(3) +
+                ")";
+        }
+
+        function settle() {
+            if (reduceMotion.matches) {
+                scaleX = 1;
+                scaleY = 1;
+                return;
+            }
+            // springs the squash back to a circle
+            scaleX += (1 - scaleX) * 0.18;
+            scaleY += (1 - scaleY) * 0.18;
+        }
+
+        function tick() {
+            if (!isDragging) {
+                x += vx;
+                y += vy;
+                vx *= FRICTION;
+                vy *= FRICTION;
+
+                if (x < minX) {
+                    x = minX;
+                    vx = -vx * BOUNCE;
+                } else if (x > maxX) {
+                    x = maxX;
+                    vx = -vx * BOUNCE;
+                }
+                if (y < minY) {
+                    y = minY;
+                    vy = -vy * BOUNCE;
+                } else if (y > maxY) {
+                    y = maxY;
+                    vy = -vy * BOUNCE;
+                }
+                if (Math.abs(vx) < 0.05) vx = 0;
+                if (Math.abs(vy) < 0.05) vy = 0;
+
+                settle();
+
+                var resting =
+                    vx === 0 &&
+                    vy === 0 &&
+                    Math.abs(scaleX - 1) < 0.002 &&
+                    Math.abs(scaleY - 1) < 0.002;
+                if (resting) {
+                    scaleX = 1;
+                    scaleY = 1;
+                    apply();
+                    rafId = null;
+                    return;
+                }
+            } else {
+                settle();
+            }
+
+            apply();
+            rafId = requestAnimationFrame(tick);
+        }
+
+        function wake() {
+            if (rafId === null) rafId = requestAnimationFrame(tick);
+        }
+
+        // start in the layout position, then measure against it
+        measure();
+        apply();
+
+        var resizeRaf = null;
+        function scheduleMeasure() {
+            if (resizeRaf) cancelAnimationFrame(resizeRaf);
+            resizeRaf = requestAnimationFrame(function () {
+                measure();
+                x = clamp(x, minX, maxX);
+                y = clamp(y, minY, maxY);
+                apply();
+            });
+        }
+        window.addEventListener("resize", scheduleMeasure);
+
+        bubble.addEventListener("pointerdown", function (e) {
+            if (e.pointerType === "mouse" && e.button !== 0) return;
+            isDragging = true;
+            pointerId = e.pointerId;
+            bubble.setPointerCapture(pointerId);
+            bubble.classList.add("is-dragging");
+            vx = 0;
+            vy = 0;
+            lastX = e.clientX;
+            lastY = e.clientY;
+            lastT = performance.now();
+            // the offset is re-derived every move, so a scale in flight at
+            // grab time cannot multiply the pointer delta
+            grabX = e.clientX - x;
+            grabY = e.clientY - y;
+            wake();
+        });
+
+        bubble.addEventListener("pointermove", function (e) {
+            if (!isDragging || e.pointerId !== pointerId) return;
+            e.preventDefault();
+
+            var now = performance.now();
+            var dx = e.clientX - lastX;
+            var dy = e.clientY - lastY;
+            var dt = now - lastT;
+
+            x = e.clientX - grabX;
+            y = e.clientY - grabY;
+            // clamp while held, not only on release: otherwise the orb can be
+            // dragged out of bounds and then visibly snaps back when let go
+            x = clamp(x, minX, maxX);
+            y = clamp(y, minY, maxY);
+            grabX = e.clientX - x;
+            grabY = e.clientY - y;
+
+            if (dt > 0) {
+                vx = clamp((dx / dt) * 16.67, -MAX_THROW, MAX_THROW);
+                vy = clamp((dy / dt) * 16.67, -MAX_THROW, MAX_THROW);
+
+                // squash along the drag axis, stretch across it
+                var mag = clamp(Math.sqrt(vx * vx + vy * vy) / MAX_THROW, 0, 1);
+                var stretch = 1 + mag * SQUASH * 0.5;
+                var squash = 1 - mag * SQUASH * 0.5;
+                if (reduceMotion.matches) {
+                    scaleX = 1;
+                    scaleY = 1;
+                } else if (Math.abs(vx) >= Math.abs(vy)) {
+                    scaleX = stretch;
+                    scaleY = squash;
+                } else {
+                    scaleX = squash;
+                    scaleY = stretch;
+                }
+            }
+
+            lastX = e.clientX;
+            lastY = e.clientY;
+            lastT = now;
+            wake();
+        });
+
+        function endDrag(e) {
+            if (!isDragging || (e && e.pointerId !== pointerId)) return;
+            isDragging = false;
+            pointerId = null;
+            bubble.classList.remove("is-dragging");
+            // no throw, no bounce, no rebound: the orb just stays put
+            if (reduceMotion.matches) {
+                vx = 0;
+                vy = 0;
+            }
+            wake();
+        }
+
+        bubble.addEventListener("pointerup", endDrag);
+        bubble.addEventListener("pointercancel", endDrag);
+    });
+
+    /* --------------------------------------------------------------------
+       CAROUSEL — snap scroller with drag, dots and buttons
+       Ported from Bencho carousel
+       ------------------------------------------------------------------ */
+    component("carousel", function () {
+        var root_ = document.querySelector("[data-carousel]");
+        if (!root_) return;
+
+        var viewport = root_.querySelector("[data-carousel-viewport]");
+        var track = root_.querySelector("[data-carousel-track]");
+        var dotsBox = root_.querySelector("[data-carousel-dots]");
+        var prevBtn = root_.querySelector("[data-carousel-prev]");
+        var nextBtn = root_.querySelector("[data-carousel-next]");
+        if (!viewport || !track) return;
+
+        var slides = Array.prototype.slice.call(track.children);
+        var index = 0;
+        var dots = [];
+
+        function step() {
+            if (slides.length < 2) return viewport.clientWidth;
+            var gap = parseFloat(getComputedStyle(track).columnGap || 0) || 0;
+            return slides[1].getBoundingClientRect().left -
+                slides[0].getBoundingClientRect().left -
+                gap;
+        }
+
+        function goTo(i, smooth) {
+            index = clamp(i, 0, slides.length - 1);
+            viewport.scrollTo({
+                left: index * step(),
+                behavior: smooth && !reduceMotion.matches ? "smooth" : "auto"
+            });
+            sync();
+        }
+
+        function sync() {
+            slides.forEach(function (s, i) {
+                s.classList.toggle("is-active", i === index);
+            });
+            dots.forEach(function (d, i) {
+                d.classList.toggle("is-active", i === index);
+                d.setAttribute("aria-current", i === index ? "true" : "false");
+            });
+            if (prevBtn) prevBtn.disabled = index === 0;
+            if (nextBtn) nextBtn.disabled = index === slides.length - 1;
+        }
+
+        // build one dot per slide
+        if (dotsBox) {
+            slides.forEach(function (_, i) {
+                var dot = document.createElement("button");
+                dot.type = "button";
+                dot.className = "carousel__dot";
+                dot.setAttribute("aria-label", "Go to step " + (i + 1));
+                dot.addEventListener("click", function () {
+                    goTo(i, true);
+                });
+                dotsBox.appendChild(dot);
+                dots.push(dot);
+            });
+        }
+
+        // Every slide snaps to the left edge, which means the last one is
+        // unreachable unless the track is padded out to fill whatever is left
+        // of the viewport. Without this the final dot scrolls to a stop and the
+        // last card can never sit at the start.
+        var spacer = document.createElement("li");
+        spacer.className = "carousel__spacer";
+        spacer.setAttribute("aria-hidden", "true");
+        track.appendChild(spacer);
+
+        function fit() {
+            var cs = getComputedStyle(viewport);
+            var padL = parseFloat(cs.paddingLeft) || 0;
+            var padR = parseFloat(cs.paddingRight) || 0;
+            var last = slides[slides.length - 1];
+            var visible = viewport.clientWidth - padL - padR;
+            var extra = Math.max(0, visible - (last ? last.offsetWidth : 0));
+            spacer.style.flexBasis = extra + "px";
+        }
+
+        fit();
+
+        if (prevBtn) prevBtn.addEventListener("click", function () { goTo(index - 1, true); });
+        if (nextBtn) nextBtn.addEventListener("click", function () { goTo(index + 1, true); });
+
+        // the dots are the single source of truth for "where am I"
+        var scrollRaf = null;
+        viewport.addEventListener(
+            "scroll",
+            function () {
+                if (scrollRaf) return;
+                scrollRaf = requestAnimationFrame(function () {
+                    scrollRaf = null;
+                    var s = step();
+                    index = s ? clamp(Math.round(viewport.scrollLeft / s), 0, slides.length - 1) : 0;
+                    sync();
+                });
+            },
+            { passive: true }
+        );
+
+        // drag-to-scroll for mouse; touch keeps native momentum scrolling
+        var dragX = 0;
+        var dragLeft = 0;
+        var dragging = false;
+        var moved = false;
+        var pointerId = null;
+
+        viewport.addEventListener("pointerdown", function (e) {
+            if (e.pointerType !== "mouse" || e.button !== 0) return;
+            if (e.target.closest("button, a")) return;
+            dragging = true;
+            moved = false;
+            pointerId = e.pointerId;
+            dragX = e.clientX;
+            dragLeft = viewport.scrollLeft;
+            viewport.classList.add("is-dragging");
+        });
+
+        window.addEventListener("pointermove", function (e) {
+            if (!dragging || e.pointerId !== pointerId) return;
+            var dx = e.clientX - dragX;
+            if (Math.abs(dx) > 3) moved = true;
+            viewport.scrollLeft = dragLeft - dx;
+        });
+
+        function endDrag(e) {
+            if (!dragging || (e && e.pointerId !== pointerId)) return;
+            dragging = false;
+            pointerId = null;
+            viewport.classList.remove("is-dragging");
+            if (moved) {
+                // let the snap position take over, then snap to it
+                var s = step();
+                if (s) {
+                    index = clamp(Math.round(viewport.scrollLeft / s), 0, slides.length - 1);
+                    goTo(index, true);
+                }
+            }
+        }
+
+        window.addEventListener("pointerup", endDrag);
+        window.addEventListener("pointercancel", endDrag);
+
+        // keyboard, on the buttons and on the viewport itself
+        viewport.addEventListener("keydown", function (e) {
+            if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+            var dir = e.key === "ArrowRight" ? 1 : -1;
+            e.preventDefault();
+            goTo(index + dir, true);
+        });
+
+        var resizeRaf = null;
+        window.addEventListener("resize", function () {
+            if (resizeRaf) cancelAnimationFrame(resizeRaf);
+            resizeRaf = requestAnimationFrame(function () {
+                // keep the same slide under the viewport after a reflow
+                fit();
+                goTo(index, false);
+            });
+        });
+
+        sync();
+    });
+
+    /* --------------------------------------------------------------------
+       TILT CARD
+       Ported from Bencho tilt-card
+       ------------------------------------------------------------------ */
+    component("tilt-card", function () {
+        var cards = document.querySelectorAll("[data-tilt]");
+        if (!cards.length || reduceMotion.matches) return;
+
+        var MAX = 7; // degrees
+
+        cards.forEach(function (card) {
+            var hasGlare = card.hasAttribute("data-tilt-glare");
+            var rafId = null;
+            var target = { x: 0, y: 0 };
+            var current = { x: 0, y: 0 };
+
+            function loop() {
+                current.x += (target.x - current.x) * 0.16;
+                current.y += (target.y - current.y) * 0.16;
+
+                if (Math.abs(target.x - current.x) < 0.01 && Math.abs(target.y - current.y) < 0.01) {
+                    current.x = target.x;
+                    current.y = target.y;
+                    card.style.setProperty("--tilt-x", current.x.toFixed(3) + "deg");
+                    card.style.setProperty("--tilt-y", current.y.toFixed(3) + "deg");
+                    rafId = null;
+                    return;
+                }
+                card.style.setProperty("--tilt-x", current.x.toFixed(3) + "deg");
+                card.style.setProperty("--tilt-y", current.y.toFixed(3) + "deg");
+                rafId = requestAnimationFrame(loop);
+            }
+
+            function start() {
+                card.classList.add("is-tilting");
+                if (rafId === null) rafId = requestAnimationFrame(loop);
+            }
+
+            card.addEventListener("pointermove", function (e) {
+                if (e.pointerType === "touch") return;
+                var r = card.getBoundingClientRect();
+                var px = (e.clientX - r.left) / r.width;
+                var py = (e.clientY - r.top) / r.height;
+
+                target.y = (px - 0.5) * 2 * MAX;
+                target.x = -(py - 0.5) * 2 * MAX;
+
+                if (hasGlare) {
+                    card.style.setProperty("--glare-x", (px * 100).toFixed(1) + "%");
+                    card.style.setProperty("--glare-y", (py * 100).toFixed(1) + "%");
+                }
+                start();
+            });
+
+            function reset() {
+                target.x = 0;
+                target.y = 0;
+                start();
+            }
+
+            card.addEventListener("pointerleave", reset);
+            card.addEventListener("blur", reset, true);
+        });
+    });
+
+    /* --------------------------------------------------------------------
+       MAGNETIC BUTTON
+       Ported from Bencho magnetic-button
+       ------------------------------------------------------------------ */
+    component("magnetic-button", function () {
+        var els = document.querySelectorAll("[data-magnetic]");
+        if (!els.length || reduceMotion.matches) return;
+
+        var STRENGTH = 0.28;
+        var RADIUS = 1.35; // how far outside the element it still pulls
+
+        els.forEach(function (el) {
+            var rafId = null;
+            var target = { x: 0, y: 0 };
+            var current = { x: 0, y: 0 };
+            var active = false;
+
+            function loop() {
+                current.x += (target.x - current.x) * 0.18;
+                current.y += (target.y - current.y) * 0.18;
+
+                if (
+                    Math.abs(target.x - current.x) < 0.05 &&
+                    Math.abs(target.y - current.y) < 0.05
+                ) {
+                    current.x = target.x;
+                    current.y = target.y;
+                    el.style.setProperty("--mx", current.x.toFixed(2) + "px");
+                    el.style.setProperty("--my", current.y.toFixed(2) + "px");
+                    rafId = null;
+                    if (!active) return;
+                    rafId = requestAnimationFrame(loop);
+                    return;
+                }
+
+                el.style.setProperty("--mx", current.x.toFixed(2) + "px");
+                el.style.setProperty("--my", current.y.toFixed(2) + "px");
+                rafId = requestAnimationFrame(loop);
+            }
+
+            function start() {
+                if (rafId === null) rafId = requestAnimationFrame(loop);
+            }
+
+            el.addEventListener("pointermove", function (e) {
+                if (e.pointerType === "touch") return;
+                var r = el.getBoundingClientRect();
+                var cx = r.left + r.width / 2;
+                var cy = r.top + r.height / 2;
+                var dx = e.clientX - cx;
+                var dy = e.clientY - cy;
+
+                // clamp the pull zone so it feels bounded, not rubbery
+                var reach = Math.max(r.width, r.height) * RADIUS;
+                var dist = Math.hypot(dx, dy) || 1;
+                var scale = dist > reach ? reach / dist : 1;
+
+                active = true;
+                target.x = dx * scale * STRENGTH;
+                target.y = dy * scale * STRENGTH;
+                start();
+            });
+
+            function release() {
+                active = false;
+                target.x = 0;
+                target.y = 0;
+                start();
+            }
+
+            el.addEventListener("pointerleave", release);
+            el.addEventListener("blur", release, true);
+        });
+    });
+
+    /* --------------------------------------------------------------------
+       SLIDE TO CONFIRM
+       Ported from Bencho slide-to-confirm
+       ------------------------------------------------------------------ */
+    component("slide-to-confirm", function () {
+        var track = document.getElementById("slideTrack");
+        var handle = document.getElementById("slideHandle");
+        var fill = document.getElementById("slideFill");
+        var label = document.getElementById("slideLabel");
+        if (!track || !handle || !fill) return;
+
+        var done = false;
+        var dragging = false;
+        var startX = 0;
+        var startOffset = 0;
+        var THRESHOLD = 0.85;
+        var PAD = 8; // track padding, matches the .slide__track padding
+
+        function maxTravel() {
+            return track.clientWidth - handle.offsetWidth - PAD * 2;
+        }
+
+        function currentOffset() {
+            var m = /translateX\(([-\d.]+)px\)/.exec(handle.style.transform);
+            return m ? parseFloat(m[1]) : 0;
+        }
+
+        function progress() {
+            var max = maxTravel();
+            return max ? currentOffset() / max : 0;
+        }
+
+        function setOffset(px) {
+            var max = maxTravel();
+            var v = clamp(px, 0, max);
+            handle.style.transform = "translateX(" + v.toFixed(1) + "px)";
+            fill.style.width = v + PAD + "px";
+            var pct = Math.round((v / (max || 1)) * 100);
+            track.setAttribute("aria-valuenow", String(pct));
+            return max ? v / max : 0;
+        }
+
+        function reset() {
+            handle.style.transition = "transform 420ms cubic-bezier(0.34,1.56,0.64,1)";
+            fill.style.transition = "width 420ms cubic-bezier(0.34,1.56,0.64,1)";
+            setOffset(0);
+            window.setTimeout(function () {
+                handle.style.transition = "";
+                fill.style.transition = "";
+            }, 440);
+        }
+
+        function complete() {
+            if (done) return;
+            done = true;
+
+            var max = maxTravel();
+            track.style.setProperty("--slide-travel", max + "px");
+            handle.style.transition = "";
+            setOffset(max);
+            track.classList.add("is-done");
+            track.setAttribute("aria-valuenow", "100");
+            track.setAttribute("aria-valuetext", "Ready. Opening your email app.");
+            if (label) label.textContent = "Opening mail…";
+
+            window.setTimeout(function () {
+                window.location.href = "mailto:wahyusou@gmail.com?subject=Hello%20Wahyu";
+            }, 420);
+
+            window.setTimeout(function () {
+                if (label) label.textContent = "Slide to say hello";
+                track.classList.remove("is-done");
+                track.style.removeProperty("--slide-travel");
+                track.setAttribute("aria-valuenow", "0");
+                track.setAttribute(
+                    "aria-valuetext",
+                    "Slide the handle to the right to compose an email"
+                );
+                done = false;
+                reset();
+            }, 6000);
+        }
+
+        track.addEventListener("pointerdown", function (e) {
+            if (done) return;
+            if (e.pointerType === "mouse" && e.button !== 0) return;
+            dragging = true;
+            track.setPointerCapture(e.pointerId);
+            startX = e.clientX;
+            startOffset = currentOffset(); // resume from wherever it currently sits
+        });
+
+        track.addEventListener("pointermove", function (e) {
+            if (!dragging || done) return;
+            e.preventDefault();
+            var p = setOffset(startOffset + (e.clientX - startX));
+            if (label) label.style.opacity = p > 0.12 ? "0" : "1";
+        });
+
+        function end(e) {
+            if (!dragging) return;
+            dragging = false;
+            if (track.hasPointerCapture(e.pointerId)) track.releasePointerCapture(e.pointerId);
+            if (label) label.style.opacity = "1";
+            if (progress() >= THRESHOLD) complete();
+            else reset();
+        }
+
+        track.addEventListener("pointerup", end);
+        track.addEventListener("pointercancel", end);
+
+        // keyboard: arrows nudge, End commits, Home rewinds
+        track.addEventListener("keydown", function (e) {
+            if (done) return;
+            var STEP = 28;
+
+            if (e.key === "ArrowRight") {
+                e.preventDefault();
+                setOffset(currentOffset() + STEP);
+                if (progress() >= THRESHOLD) complete();
+            } else if (e.key === "ArrowLeft") {
+                e.preventDefault();
+                setOffset(currentOffset() - STEP);
+            } else if (e.key === "Home") {
+                e.preventDefault();
+                reset();
+            } else if (e.key === "End" || e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                complete();
+            }
+        });
+    });
+
+    /* --------------------------------------------------------------------
+       INLINE CONFIRM — copy to clipboard
+       Ported from Bencho inline-confirm
+       ------------------------------------------------------------------ */
+    component("inline-confirm", function () {
+        var targets = document.querySelectorAll("[data-copy-email]");
+        if (!targets.length) return;
+
+        function flash(el, ok) {
+            var hint = el.querySelector("[data-copy-hint]");
+            var label = el.querySelector("[data-copy-label]");
+            if (!hint) return;
+
+            el.classList.add("is-copied");
+            hint.textContent = ok ? "Copied" : "Press ⌘C";
+            if (label) {
+                var original = label.textContent;
+                label.textContent = ok ? "On your clipboard" : original;
+            }
+
+            window.setTimeout(function () {
+                el.classList.remove("is-copied");
+                hint.textContent = "Copy";
+                if (label) {
+                    var value = el.getAttribute("data-copy-email");
+                    if (value) label.textContent = value;
+                }
+            }, 2000);
+        }
+
+        targets.forEach(function (el) {
+            var value = el.getAttribute("data-copy-email");
+            if (!value) return;
+
+            el.addEventListener("click", function (e) {
+                // let the link still do its job (open mailto), just copy too
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(value).then(
+                        function () {
+                            flash(el, true);
+                        },
+                        function () {
+                            flash(el, false);
+                        }
+                    );
+                } else {
+                    // http fallback (GitHub Pages is https, but be safe)
+                    var ta = document.createElement("textarea");
+                    ta.value = value;
+                    ta.setAttribute("readonly", "");
+                    ta.style.cssText = "position:fixed;top:-1000px;opacity:0";
+                    document.body.appendChild(ta);
+                    ta.select();
+                    var ok = false;
+                    try {
+                        ok = document.execCommand("copy");
+                    } catch (err) {}
+                    document.body.removeChild(ta);
+                    flash(el, ok);
+                }
+                e.preventDefault();
+                // navigate explicitly since we prevented the default
+                if (el.tagName === "A") {
+                    if (el.getAttribute("href").startsWith("mailto:")) {
+                        window.location.href = el.getAttribute("href");
+                    } else {
+                        window.open(el.getAttribute("href"), "_blank", "noopener");
+                    }
+                }
+            });
+        });
+    });
+
+    /* --------------------------------------------------------------------
+       NAV — sticky state, hide on scroll down, active section
+       ------------------------------------------------------------------ */
+    component("nav", function () {
+        var nav = document.getElementById("nav");
+        if (!nav) return;
+
+        var lastY = window.scrollY;
+        var ticking = false;
+
+        function onScroll() {
+            var y = window.scrollY;
+            nav.classList.toggle("is-stuck", y > 24);
+
+            // never hide while a child has focus, otherwise keyboard users
+            // are stranded on an off-screen element
+            var focused = nav.contains(document.activeElement);
+
+            if (!focused && y > 240 && y > lastY + 4) nav.classList.add("is-hidden");
+            else if (y < lastY - 4 || y < 240) nav.classList.remove("is-hidden");
+
+            lastY = y;
+            ticking = false;
+        }
+
+        window.addEventListener(
+            "scroll",
+            function () {
+                if (ticking) return;
+                ticking = true;
+                requestAnimationFrame(onScroll);
+            },
+            { passive: true }
+        );
+        // bring it back if focus lands inside while it is hidden
+        nav.addEventListener("focusin", function () {
+            nav.classList.remove("is-hidden");
+        });
+        onScroll();
+
+        // active link based on which section is in view
+        var links = document.querySelectorAll("[data-nav-link]");
+        var sections = Array.prototype.map.call(links, function (a) {
+            return document.querySelector(a.getAttribute("href"));
+        });
+
+        if ("IntersectionObserver" in window && sections.length) {
+            var navIo = new IntersectionObserver(
+                function (entries) {
+                    entries.forEach(function (entry) {
+                        if (!entry.isIntersecting) return;
+                        var idx = sections.indexOf(entry.target);
+                        if (idx === -1) return;
+                        links.forEach(function (a, i) {
+                            a.classList.toggle("is-active", i === idx);
+                        });
+                    });
+                },
+                { rootMargin: "-45% 0px -50% 0px" }
+            );
+            sections.forEach(function (s) {
+                if (s) navIo.observe(s);
+            });
+        }
+    });
+
+    /* --------------------------------------------------------------------
+       STAT COUNTERS
+       ------------------------------------------------------------------ */
+    component("stat-counters", function () {
+        var nums = document.querySelectorAll("[data-count]");
+        if (!nums.length) return;
+
+        function animate(el) {
+            var target = parseFloat(el.getAttribute("data-count")) || 0;
+            var suffix = el.getAttribute("data-suffix") || "";
+            if (reduceMotion.matches) {
+                el.textContent = target + suffix;
+                return;
+            }
+
+            var start = performance.now();
+            var DUR = 1100;
+
+            function step(now) {
+                var p = Math.min((now - start) / DUR, 1);
+                var eased = 1 - Math.pow(1 - p, 3);
+                el.textContent = Math.round(eased * target) + suffix;
+                if (p < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+
+        if (!("IntersectionObserver" in window)) {
+            nums.forEach(animate);
+            return;
+        }
+
+        var io = new IntersectionObserver(
+            function (entries) {
+                entries.forEach(function (entry) {
+                    if (!entry.isIntersecting) return;
+                    animate(entry.target);
+                    io.unobserve(entry.target);
+                });
+            },
+            { threshold: 0.6 }
+        );
+        nums.forEach(function (el) {
+            io.observe(el);
+        });
+    });
+
+    /* --------------------------------------------------------------------
+       VISIT COUNT — client-side only, no backend available on Pages
+       Adapted from ObsidianUI visitor-count
+       ------------------------------------------------------------------ */
+    component("visit-count", function () {
+        var el = document.getElementById("visitCount");
+        var noun = document.getElementById("visitNoun");
+        if (!el) return;
+
+        var KEY = "portoh-visit-count";
+        var count = 1;
+
+        try {
+            var prev = parseInt(localStorage.getItem(KEY) || "0", 10);
+            count = (isNaN(prev) ? 0 : prev) + 1;
+            localStorage.setItem(KEY, String(count));
+        } catch (e) {
+            el.textContent = "—";
+            return;
+        }
+
+        el.textContent = String(count);
+        if (noun) noun.textContent = count === 1 ? "visit" : "visits";
+    });
+
+    /* --------------------------------------------------------------------
+       CASE STUDY SHEET
+       Ported from ObsidianUI sheet
+       ------------------------------------------------------------------ */
+    component("case-study-sheet", function () {
+        var CASE_STUDIES = {
+            artha: {
+                title: "artha",
+                summary:
+                    "Aplikasi Flutter yang dipakai untuk kebutuhan nyata dan berhasil menarik minat komunitas.",
+                problem:
+                    "Membangun app yang tetap stabil untuk penggunaan real-world sambil menjaga kecepatan iterasi fitur.",
+                approach:
+                    "Fokus pada pengalaman pengguna inti, optimasi flow penting, dan maintainability agar update bisa berjalan konsisten.",
+                stack: ["Dart", "Flutter", "Mobile"],
+                highlights: [
+                    "Dipakai untuk use case nyata",
+                    "Iterasi fitur berkelanjutan",
+                    "Mendapat respons komunitas"
+                ],
+                repo: "https://github.com/wahyuatmaja3/artha"
+            },
+            "pendaftaran-siswa-smktag": {
+                title: "pendaftaran-siswa-smktag",
+                summary:
+                    "Sistem pendaftaran siswa berbasis Flutter untuk mempermudah proses input dan tracking data enrollment.",
+                problem:
+                    "Alur pendaftaran manual rentan lambat dan sulit dipantau ketika jumlah pendaftar meningkat.",
+                approach:
+                    "Merancang form, validasi, dan alur data yang terstruktur supaya proses pendaftaran lebih cepat dan minim kesalahan.",
+                stack: ["Dart", "Flutter", "Education"],
+                highlights: [
+                    "Form pendaftaran terstruktur",
+                    "Alur data lebih konsisten",
+                    "UI ramah operator sekolah"
+                ],
+                repo: "https://github.com/wahyuatmaja3/pendaftaran-siswa-smktag"
+            },
+            kyros: {
+                title: "kyros",
+                summary:
+                    "Project web berbasis PHP yang dibangun untuk kebutuhan pembelajaran sekaligus melatih praktik arsitektur backend dasar.",
+                problem:
+                    "Membutuhkan project yang tidak hanya selesai secara fitur, tapi juga tetap rapih untuk proses belajar dan iterasi.",
+                approach:
+                    "Menerapkan pola struktur route-view-data sederhana yang mudah dipahami, lalu mengoptimalkan alur CRUD inti.",
+                stack: ["PHP", "Web", "School Project"],
+                highlights: [
+                    "CRUD flow end-to-end",
+                    "Struktur folder mudah dipahami",
+                    "Baseline yang siap dikembangkan"
+                ],
+                repo: "https://github.com/wahyuatmaja3/kyros"
+            },
+            figureiie: {
+                title: "figureiie",
+                summary:
+                    "Aplikasi Laravel Blade untuk menunjukkan kapabilitas full-stack web dari sisi rendering server hingga tampilan UI.",
+                problem:
+                    "Perlu menyeimbangkan kecepatan delivery dan maintainability pada aplikasi berbasis template server-rendered.",
+                approach:
+                    "Memanfaatkan Blade component untuk reuse tampilan, menjaga konsistensi antar halaman, dan mengurangi duplikasi.",
+                stack: ["Blade", "Laravel", "PHP"],
+                highlights: [
+                    "Komponen Blade reusable",
+                    "Konsistensi desain antarmuka",
+                    "Alur pengembangan lebih cepat"
+                ],
+                repo: "https://github.com/wahyuatmaja3/figureiie"
+            },
+            "deiji-marketplace": {
+                title: "deiji-marketplace",
+                summary:
+                    "Marketplace web app yang fokus ke experience belanja cepat dengan flow produk, katalog, dan checkout yang sederhana.",
+                problem:
+                    "Perlu membangun fondasi e-commerce yang bersih agar mudah dikembangkan, sambil menjaga UI tetap ringan untuk user baru.",
+                approach:
+                    "Menyusun struktur halaman dan komponen UI modular, memprioritaskan alur utama browsing produk hingga action pembelian.",
+                stack: ["HTML", "CSS", "E-Commerce"],
+                highlights: [
+                    "Struktur halaman modular agar mudah scale",
+                    "Visual hierarchy jelas untuk conversion flow",
+                    "Interaksi ringan agar performa tetap baik"
+                ],
+                repo: "https://github.com/wahyuatmaja3/deiji-marketplace"
+            },
+            yakusoku: {
+                title: "yakusoku",
+                summary:
+                    "Eksperimen JavaScript untuk mengeksplor pola interaksi modern dan pengalaman pengguna yang lebih hidup.",
+                problem:
+                    "Butuh playground untuk mencoba pattern interaksi tanpa overhead framework yang berat.",
+                approach:
+                    "Membangun interaksi langsung dengan vanilla JavaScript dan fokus pada transisi yang responsif.",
+                stack: ["JavaScript", "Web"],
+                highlights: ["Interaksi front-end responsif", "Animasi ringan dan halus", "Eksperimen pattern UI modern"],
+                repo: "https://github.com/wahyuatmaja3/yakusoku"
+            }
+        };
+
+        var sheet = document.getElementById("sheet");
+        var panel = sheet && sheet.querySelector(".sheet__panel");
+        var closeBtn = document.getElementById("sheetClose");
+        if (!sheet || !panel) return;
+
+        var fields = {
+            title: document.getElementById("sheetTitle"),
+            summary: document.getElementById("sheetSummary"),
+            problem: document.getElementById("sheetProblem"),
+            approach: document.getElementById("sheetSolution"),
+            stack: document.getElementById("sheetStack"),
+            highlights: document.getElementById("sheetHighlights"),
+            repo: document.getElementById("sheetRepo"),
+            github: document.getElementById("sheetGitHub")
+        };
+
+        var lastTrigger = null;
+
+        function fillList(el, items) {
+            el.textContent = "";
+            items.forEach(function (item) {
+                var li = document.createElement("li");
+                li.textContent = item;
+                el.appendChild(li);
+            });
+        }
+
+        function open(id, trigger) {
+            var data = CASE_STUDIES[id];
+            if (!data) return;
+
+            lastTrigger = trigger || null;
+            fields.title.textContent = data.title;
+            fields.summary.textContent = data.summary;
+            fields.problem.textContent = data.problem;
+            fields.approach.textContent = data.approach;
+            fillList(fields.stack, data.stack);
+            fillList(fields.highlights, data.highlights);
+            fields.repo.href = data.repo;
+            fields.github.href = data.repo;
+
+            sheet.classList.add("is-open");
+            sheet.setAttribute("aria-hidden", "false");
+            document.body.style.overflow = "hidden";
+            panel.scrollTop = 0;
+            if (closeBtn) closeBtn.focus();
+        }
+
+        function close() {
+            if (!sheet.classList.contains("is-open")) return;
+            sheet.classList.remove("is-open");
+            sheet.setAttribute("aria-hidden", "true");
+            document.body.style.overflow = "";
+            if (lastTrigger) lastTrigger.focus();
+            lastTrigger = null;
+        }
+
+        document.addEventListener("click", function (e) {
+            var trigger = e.target.closest("[data-case-study]");
+            if (!trigger) return;
+            e.preventDefault();
+            open(trigger.getAttribute("data-case-study"), trigger);
+        });
+
+        if (closeBtn) closeBtn.addEventListener("click", close);
+        sheet.addEventListener("click", function (e) {
+            if (e.target.hasAttribute("data-sheet-close")) close();
+        });
+
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape" && sheet.classList.contains("is-open")) close();
+        });
+
+        // keep focus inside the sheet while it is open
+        sheet.addEventListener("keydown", function (e) {
+            if (e.key !== "Tab" || !sheet.classList.contains("is-open")) return;
+            var focusables = panel.querySelectorAll(
+                'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+            );
+            if (!focusables.length) return;
+            var first = focusables[0];
+            var last = focusables[focusables.length - 1];
+
+            if (e.shiftKey && document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+            } else if (!e.shiftKey && document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+            }
+        });
+    });
+
+    /* --------------------------------------------------------------------
+       COMMAND BAR
+       Ported from Bencho command-bar
+       ------------------------------------------------------------------ */
+    component("command-bar", function () {
+        var cmd = document.getElementById("cmd");
+        var input = document.getElementById("cmdInput");
+        var list = document.getElementById("cmdList");
+        var trigger = document.getElementById("cmdTrigger");
+        var kbd = document.getElementById("cmdKbd");
+        if (!cmd || !input || !list) return;
+
+        var isMac = /Mac|iPhone|iPad|iPod/i.test(navigator.platform || navigator.userAgent);
+        if (kbd) kbd.textContent = isMac ? "⌘K" : "Ctrl K";
+
+        var COMMANDS = [
+            { group: "Go to", icon: "01", title: "Home", hint: "Top of page", run: function () { go("#hero"); } },
+            { group: "Go to", icon: "02", title: "About", hint: "Who I am", run: function () { go("#about"); } },
+            { group: "Go to", icon: "03", title: "Skills", hint: "Tech stack", run: function () { go("#skills"); } },
+            { group: "Go to", icon: "04", title: "Work", hint: "Selected projects", run: function () { go("#projects"); } },
+            { group: "Go to", icon: "05", title: "Process", hint: "How I work", run: function () { go("#process"); } },
+            { group: "Go to", icon: "06", title: "Contact", hint: "Get in touch", run: function () { go("#contact"); } },
+            {
+                group: "Actions",
+                icon: "✉",
+                title: "Copy email address",
+                hint: "wahyusou@gmail.com",
+                run: function () {
+                    if (navigator.clipboard) navigator.clipboard.writeText("wahyusou@gmail.com");
+                }
+            },
+            {
+                group: "Actions",
+                icon: "◐",
+                title: "Toggle theme",
+                hint: "Obsidian ⇄ Prism",
+                run: function () {
+                    applyTheme(getTheme() === "obsidian" ? "prism" : "obsidian");
+                }
+            },
+            {
+                group: "Actions",
+                icon: "↗",
+                title: "Email me",
+                hint: "Open your mail app",
+                run: function () {
+                    window.location.href = "mailto:wahyusou@gmail.com";
+                }
+            },
+            {
+                group: "Open",
+                icon: "GH",
+                title: "GitHub profile",
+                hint: "wahyuatmaja3",
+                run: function () {
+                    window.open("https://github.com/wahyuatmaja3", "_blank", "noopener");
+                }
+            },
+            {
+                group: "Open",
+                icon: "in",
+                title: "LinkedIn profile",
+                hint: "Wahyu Tri Atmaja",
+                run: function () {
+                    window.open(
+                        "https://id.linkedin.com/in/wahyu-tri-atmaja-642207376",
+                        "_blank",
+                        "noopener"
+                    );
+                }
+            },
+            {
+                group: "Open",
+                icon: "19",
+                title: "All repositories",
+                hint: "19 public repos",
+                run: function () {
+                    window.open(
+                        "https://github.com/wahyuatmaja3?tab=repositories",
+                        "_blank",
+                        "noopener"
+                    );
+                }
+            }
+        ];
+
+        var results = [];
+        var active = 0;
+        var lastTrigger = null;
+
+        function go(hash) {
+            var el = document.querySelector(hash);
+            if (el) el.scrollIntoView({ behavior: reduceMotion.matches ? "auto" : "smooth" });
+        }
+
+        /** Subsequence match with the matched characters collected for highlighting. */
+        function match(item, query) {
+            if (!query) return { score: 0, positions: [] };
+            var hay = item.title.toLowerCase();
+            var positions = [];
+            var cursor = 0;
+            var score = 0;
+
+            for (var i = 0; i < query.length; i++) {
+                var q = query[i];
+                if (q === " ") continue;
+                var at = hay.indexOf(q, cursor);
+                if (at === -1) return null;
+                positions.push(at);
+                // reward matches that continue from the previous one
+                if (at === cursor && cursor > 0) score += 3;
+                score += at === 0 ? 5 : 1;
+                cursor = at + 1;
+            }
+            score -= item.title.length * 0.05;
+            return { score: score, positions: positions };
+        }
+
+        function highlight(text, positions) {
+            if (!positions.length) return text;
+            var out = "";
+            positions.forEach(function (p, i) {
+                if (i === 0) out += text.slice(0, p);
+                out += "<mark>" + text.charAt(p) + "</mark>";
+            });
+            var last = positions[positions.length - 1];
+            out += text.slice(last + 1);
+            return out;
+        }
+
+        function render() {
+            var query = input.value.trim().toLowerCase();
+            list.textContent = "";
+
+            results = [];
+            COMMANDS.forEach(function (item) {
+                var m = match(item, query);
+                if (m) results.push({ item: item, positions: m.positions, score: m.score });
+            });
+
+            results.sort(function (a, b) {
+                return b.score - a.score;
+            });
+
+            if (!results.length) {
+                var empty = document.createElement("li");
+                empty.className = "cmd__empty";
+                empty.textContent = "No matches for “" + input.value.trim() + "”";
+                list.appendChild(empty);
+                return;
+            }
+
+            var currentGroup = null;
+            results.forEach(function (r, i) {
+                if (r.item.group !== currentGroup) {
+                    currentGroup = r.item.group;
+                    var label = document.createElement("li");
+                    label.className = "cmd__group-label";
+                    label.setAttribute("role", "presentation");
+                    label.textContent = currentGroup;
+                    list.appendChild(label);
+                }
+
+                var li = document.createElement("li");
+                li.className = "cmd__item";
+                li.setAttribute("role", "option");
+                li.setAttribute("aria-selected", String(i === 0));
+                li.id = "cmd-item-" + i;
+                li.dataset.index = String(i);
+
+                var icon = document.createElement("span");
+                icon.className = "cmd__item-icon";
+                icon.setAttribute("aria-hidden", "true");
+                icon.textContent = r.item.icon;
+
+                var text = document.createElement("span");
+                text.className = "cmd__item-text";
+                var title = document.createElement("span");
+                title.className = "cmd__item-title";
+                title.innerHTML = highlight(r.item.title, r.positions);
+                text.appendChild(title);
+
+                var hint = document.createElement("span");
+                hint.className = "cmd__item-hint";
+                hint.textContent = r.item.hint;
+
+                li.appendChild(icon);
+                li.appendChild(text);
+                li.appendChild(hint);
+                list.appendChild(li);
+            });
+
+            active = 0;
+            input.setAttribute("aria-activedescendant", "cmd-item-0");
+        }
+
+        function setActive(i) {
+            var items = list.querySelectorAll(".cmd__item");
+            if (!items.length) return;
+            active = (i + items.length) % items.length;
+            items.forEach(function (el, idx) {
+                var on = idx === active;
+                el.setAttribute("aria-selected", String(on));
+                if (on) {
+                    el.scrollIntoView({ block: "nearest" });
+                    input.setAttribute("aria-activedescendant", el.id);
+                }
+            });
+        }
+
+        function openCmd(triggerEl) {
+            lastTrigger = triggerEl || null;
+            cmd.classList.add("is-open");
+            cmd.setAttribute("aria-hidden", "false");
+            input.value = "";
+            render();
+            window.setTimeout(function () {
+                input.focus();
+            }, 60);
+        }
+
+        function closeCmd() {
+            if (!cmd.classList.contains("is-open")) return;
+            cmd.classList.remove("is-open");
+            cmd.setAttribute("aria-hidden", "true");
+            input.blur();
+            if (lastTrigger) lastTrigger.focus();
+            lastTrigger = null;
+        }
+
+        if (trigger) trigger.addEventListener("click", function () { openCmd(trigger); });
+        cmd.addEventListener("click", function (e) {
+            if (e.target.hasAttribute("data-cmd-close")) closeCmd();
+        });
+
+        input.addEventListener("input", render);
+
+        input.addEventListener("keydown", function (e) {
+            if (e.key === "ArrowDown") {
+                e.preventDefault();
+                setActive(active + 1);
+            } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                setActive(active - 1);
+            } else if (e.key === "Enter") {
+                e.preventDefault();
+                var r = results[active];
+                if (r) {
+                    closeCmd();
+                    r.item.run();
+                }
+            } else if (e.key === "Escape") {
+                e.preventDefault();
+                closeCmd();
+            } else if (e.key === "Home") {
+                e.preventDefault();
+                setActive(0);
+            } else if (e.key === "End") {
+                e.preventDefault();
+                setActive(results.length - 1);
+            }
+        });
+
+        // click a result
+        list.addEventListener("click", function (e) {
+            var li = e.target.closest(".cmd__item");
+            if (!li) return;
+            var r = results[parseInt(li.dataset.index, 10)];
+            if (!r) return;
+            closeCmd();
+            r.item.run();
+        });
+
+        // pointer hover moves the selection
+        list.addEventListener("pointermove", function (e) {
+            var li = e.target.closest(".cmd__item");
+            if (li) setActive(parseInt(li.dataset.index, 10));
+        });
+
+        document.addEventListener("keydown", function (e) {
+            var combo = isMac ? e.metaKey && e.key === "k" : e.ctrlKey && e.key === "k";
+            if (combo) {
+                e.preventDefault();
+                if (cmd.classList.contains("is-open")) closeCmd();
+                else openCmd(trigger);
+                return;
+            }
+            if (e.key === "Escape" && cmd.classList.contains("is-open")) closeCmd();
+        });
+    });
+
+    /* --------------------------------------------------------------------
+       SMOOTH ANCHORS — offset-aware, works without native smooth scroll
+       ------------------------------------------------------------------ */
+    component("smooth-anchors", function () {
+        document.addEventListener("click", function (e) {
+            var link = e.target.closest('a[href^="#"]');
+            if (!link) return;
+
+            var hash = link.getAttribute("href");
+            if (!hash || hash === "#") return;
+
+            var target = document.querySelector(hash);
+            if (!target) return;
+
+            e.preventDefault();
+            target.scrollIntoView({
+                behavior: reduceMotion.matches ? "auto" : "smooth",
+                block: "start"
+            });
+
+            // move focus for keyboard and screen reader users
+            target.setAttribute("tabindex", "-1");
+            target.focus({ preventScroll: true });
+
+            if (history.replaceState) history.replaceState(null, "", hash);
+        });
+    });
+}());
