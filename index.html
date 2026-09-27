@@ -1,645 +1,811 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="obsidian">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Wahyu Tri Atmaja — Developer Portfolio</title>
+        <title>Wahyu Tri Atmaja — Flutter Engineer</title>
         <meta
             name="description"
-            content="Portfolio of Wahyu Tri Atmaja, a Mobile & Desktop Developer from Surabaya. Specializing in Flutter, Dart, and more."
+            content="Portfolio of Wahyu Tri Atmaja, a Mobile &amp; Desktop Developer from Surabaya. Specializing in Flutter, Dart, and legacy system maintenance."
         />
+        <meta name="theme-color" content="#08080a" />
+        <meta name="color-scheme" content="dark light" />
+
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Wahyu Tri Atmaja — Flutter Engineer" />
+        <meta
+            property="og:description"
+            content="Mobile &amp; Desktop Developer dari Surabaya. 3+ tahun pengalaman profesional, membangun produk mobile dengan Flutter."
+        />
+
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
-            href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&family=VT323&display=swap"
+            href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Inter:wght@300..700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap"
             rel="stylesheet"
         />
         <link rel="stylesheet" href="style.css" />
+
+        <script>
+            // Applied before first paint so the theme never flashes.
+            try {
+                var t = localStorage.getItem("portoh-theme");
+                if (t === "prism" || t === "obsidian") {
+                    document.documentElement.setAttribute("data-theme", t);
+                }
+            } catch (e) {}
+        </script>
     </head>
 
-    <body data-theme="default">
-        <!-- ======= LOADER ======= -->
-        <div id="loader">
-            <div class="loader-inner">
-                <div class="loader-bar"></div>
-                <span class="loader-text">Loading...</span>
+    <body>
+        <a class="skip-link" href="#main">Skip to content</a>
+
+        <!-- Shared SVG filters: gooey merge for blobs + toggle, noise for grain -->
+        <svg class="svg-defs" aria-hidden="true" focusable="false">
+            <defs>
+                <filter id="gooey">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur" />
+                    <feColorMatrix
+                        in="blur"
+                        mode="matrix"
+                        values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -11"
+                        result="goo"
+                    />
+                    <feBlend in="SourceGraphic" in2="goo" />
+                </filter>
+                <filter id="gooey-soft">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+                    <feColorMatrix
+                        in="blur"
+                        mode="matrix"
+                        values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8"
+                        result="goo"
+                    />
+                    <feBlend in="SourceGraphic" in2="goo" />
+                </filter>
+            </defs>
+        </svg>
+
+        <!-- ======= PRELOADER: gooey blobs (ObsidianUI loaders-gooey-blobs) ======= -->
+        <div class="preloader" id="preloader" role="status" aria-live="polite">
+            <div class="preloader__blobs" aria-hidden="true">
+                <span class="preloader__blob"></span>
+                <span class="preloader__blob"></span>
+                <span class="preloader__blob"></span>
             </div>
+            <p class="preloader__count"><span id="preloaderCount">0</span><span class="preloader__pct">%</span></p>
+            <p class="preloader__label">WTA<span class="accent">.</span></p>
         </div>
 
-        <!-- ======= NAV ======= -->
-        <nav id="navbar">
-            <div class="nav-logo">WTA<span class="accent">.</span></div>
-            <ul class="nav-links">
-                <li><a href="#hero">Home</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#skills">Skills</a></li>
-                <li><a href="#projects">Projects</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-            <button
-                class="nav-cta"
-                onclick="
-                    document
-                        .getElementById('contact')
-                        .scrollIntoView({ behavior: 'smooth' })
-                "
-            >
-                Get in Touch
-            </button>
-        </nav>
+        <!-- Click spark overlay (ObsidianUI click-spark) -->
+        <canvas class="click-spark" id="clickSpark" aria-hidden="true"></canvas>
 
-        <!-- ======= HERO ======= -->
-        <section id="hero">
-            <div class="hero-content">
-                <div class="hero-badge">
-                    <span class="badge-dot"></span>
-                    Available for work
-                </div>
-                <img src="y2k-asset.png" class="y2k-asset" alt="Y2K aesthetic spinning CD globe" style="top: -50px; right: -100px; width: 250px; opacity: 0.8; filter: drop-shadow(4px 4px 0 #000);">
-                <h1 class="hero-title">
-                    <span class="title-line">Wahyu Tri Atmaja</span>
-                </h1>
-                <p class="hero-subtitle">Flutter Engineer for Product Teams</p>
-                <p class="hero-desc">
-                    I help product teams ship reliable mobile experiences faster with Flutter, backed by 3+ years of delivery and desktop system maintenance expertise.
-                </p>
-                <div class="hero-actions">
-                    <button class="btn-primary" onclick="document.getElementById('projects').scrollIntoView({behavior:'smooth'})">
-                        View Projects
-                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+        <!-- ======= NAVBAR ======= -->
+        <header class="nav" id="nav">
+            <div class="nav__inner">
+                <a class="nav__logo" href="#hero" data-magnetic>
+                    <span class="nav__logo-mark">WTA<span class="accent">.</span></span>
+                </a>
+
+                <nav class="nav__links" aria-label="Sections">
+                    <a href="#about" data-nav-link><span>01</span> About</a>
+                    <a href="#skills" data-nav-link><span>02</span> Skills</a>
+                    <a href="#projects" data-nav-link><span>03</span> Work</a>
+                    <a href="#process" data-nav-link><span>04</span> Process</a>
+                    <a href="#contact" data-nav-link><span>05</span> Contact</a>
+                </nav>
+
+                <div class="nav__actions">
+                    <button class="cmd-trigger" id="cmdTrigger" type="button" aria-label="Open command menu">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <circle cx="11" cy="11" r="7" />
+                            <path d="M20 20l-3.5-3.5" stroke-linecap="round" />
                         </svg>
+                        <span class="cmd-trigger__label">Search</span>
+                        <kbd class="kbd" id="cmdKbd">Ctrl K</kbd>
                     </button>
-                    <a class="btn-secondary" href="https://github.com/wahyuatmaja3" target="_blank">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z" />
-                        </svg>
-                        GitHub
-                    </a>
-                </div>
-            </div>
-        </section>
 
-        <!-- ======= ABOUT ======= -->
-        <section id="about">
-            <div class="section-header">
-                <span class="section-tag">About Me</span>
-                <h2 class="section-title">Who Am I?</h2>
-            </div>
-            <div class="about-grid">
-                <div class="about-text">
-                    <p class="about-lead">
-                        Mobile & Desktop Developer dari Surabaya dengan 3+ tahun pengalaman profesional.
-                    </p>
-                    <p>
-                        Saya fokus pada pengembangan aplikasi mobile menggunakan <strong>Flutter</strong>
-                        dan maintenance sistem desktop dengan <strong>Delphi</strong>.
-                        Passionate tentang clean code dan user experience.
-                    </p>
-                </div>
-                <div class="about-stats">
-                    <div class="stat-item">
-                        <span class="stat-num">3+</span>
-                        <span class="stat-label">Years Experience</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-num">19</span>
-                        <span class="stat-label">GitHub Repos</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-num">2</span>
-                        <span class="stat-label">Active Roles</span>
-                    </div>
+                    <!-- Liquid theme toggle (Bencho liquid-toggle, gooey merge) -->
+                    <button
+                        class="theme-toggle"
+                        id="themeToggle"
+                        type="button"
+                        role="switch"
+                        aria-checked="false"
+                        aria-label="Switch to Prism theme"
+                    >
+                        <span class="theme-toggle__gooey" aria-hidden="true">
+                            <span class="theme-toggle__pill"></span>
+                            <span class="theme-toggle__knob">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                                    <path class="theme-toggle__moon" d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z" />
+                                    <g class="theme-toggle__sun">
+                                        <circle cx="12" cy="12" r="4" />
+                                        <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+                                    </g>
+                                </svg>
+                            </span>
+                        </span>
+                        <span class="sr-only" id="themeToggleState">Current theme: Obsidian</span>
+                    </button>
                 </div>
             </div>
-        </section>
+        </header>
 
-        <!-- ======= SKILLS ======= -->
-        <section id="skills">
-            <div class="section-header">
-                <span class="section-tag">Skills</span>
-                <h2 class="section-title">Tech Stack</h2>
-            </div>
-            <div class="skills-grid">
-                <div class="skill-category">
-                    <h3 class="skill-cat-title">Languages</h3>
-                    <div class="skill-pills">
-                        <div class="skill-pill">
-                            <span class="pill-icon">🎯</span><span>Dart</span>
-                            <div class="pill-bar">
-                                <div class="pill-fill" style="width: 90%"></div>
-                            </div>
-                        </div>
-                        <div class="skill-pill">
-                            <span class="pill-icon">☕</span><span>Java</span>
-                            <div class="pill-bar">
-                                <div class="pill-fill" style="width: 75%"></div>
-                            </div>
-                        </div>
-                        <div class="skill-pill">
-                            <span class="pill-icon">🔷</span><span>Pascal</span>
-                            <div class="pill-bar">
-                                <div class="pill-fill" style="width: 70%"></div>
-                            </div>
-                        </div>
-                        <div class="skill-pill">
-                            <span class="pill-icon">🐍</span><span>Python</span>
-                            <div class="pill-bar">
-                                <div class="pill-fill" style="width: 65%"></div>
-                            </div>
-                        </div>
-                        <div class="skill-pill">
-                            <span class="pill-icon">🚀</span><span>Go</span>
-                            <div class="pill-bar">
-                                <div class="pill-fill" style="width: 55%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="skill-category">
-                    <h3 class="skill-cat-title">Frameworks</h3>
-                    <div class="skill-pills">
-                        <div class="skill-pill">
-                            <span class="pill-icon">📱</span
-                            ><span>Flutter</span>
-                            <div class="pill-bar">
-                                <div class="pill-fill" style="width: 92%"></div>
-                            </div>
-                        </div>
-                        <div class="skill-pill">
-                            <span class="pill-icon">🖥️</span
-                            ><span>Delphi 5</span>
-                            <div class="pill-bar">
-                                <div class="pill-fill" style="width: 70%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="skill-category">
-                    <h3 class="skill-cat-title">Tools</h3>
-                    <div class="skill-pills">
-                        <div class="skill-pill">
-                            <span class="pill-icon">🔧</span><span>Git</span>
-                            <div class="pill-bar">
-                                <div class="pill-fill" style="width: 85%"></div>
-                            </div>
-                        </div>
-                        <div class="skill-pill">
-                            <span class="pill-icon">🤖</span
-                            ><span>Android Studio</span>
-                            <div class="pill-bar">
-                                <div class="pill-fill" style="width: 88%"></div>
-                            </div>
-                        </div>
-                        <div class="skill-pill">
-                            <span class="pill-icon">💻</span
-                            ><span>VS Code</span>
-                            <div class="pill-bar">
-                                <div class="pill-fill" style="width: 90%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <main id="main">
+            <!-- ======= HERO ======= -->
+            <section class="section section--hero" id="hero">
+                <!-- Cursor-reactive particle field (Bencho particles) -->
+                <canvas class="hero__particles" data-particles aria-hidden="true"></canvas>
 
-        <!-- ======= PROJECTS ======= -->
-        <section id="projects">
-            <div class="section-header">
-                <span class="section-tag">Work</span>
-                <h2 class="section-title">Projects</h2>
-            </div>
-            <div class="projects-grid">
-                <a
-                    class="project-card"
-                    data-project-id="deiji-marketplace"
-                    href="https://github.com/wahyuatmaja3/deiji-marketplace"
-                    target="_blank"
-                >
-                    <div class="project-glow"></div>
-                    <div class="project-header">
-                        <div class="project-lang html">HTML</div>
-                        <svg
-                            class="project-arrow"
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <path d="M7 17L17 7M7 7h10v10" />
-                        </svg>
-                    </div>
-                    <h3 class="project-name">deiji-marketplace</h3>
-                    <p class="project-desc">
-                        A marketplace web application built with HTML. Clean and
-                        functional e-commerce solution.
+                <div class="shell hero__inner">
+                    <p class="availability" data-reveal>
+                        <span class="availability__pulse" aria-hidden="true"></span>
+                        Available for work — Surabaya, ID
                     </p>
-                    <div class="project-tags">
-                        <span>HTML</span><span>CSS</span><span>E-Commerce</span>
-                    </div>
-                </a>
-                <a
-                    class="project-card"
-                    data-project-id="kyros"
-                    href="https://github.com/wahyuatmaja3/kyros"
-                    target="_blank"
-                >
-                    <div class="project-glow"></div>
-                    <div class="project-header">
-                        <div class="project-lang php">PHP</div>
-                        <svg
-                            class="project-arrow"
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <path d="M7 17L17 7M7 7h10v10" />
-                        </svg>
-                    </div>
-                    <h3 class="project-name">kyros</h3>
-                    <p class="project-desc">
-                        Web programming school project. Built to fulfill web
-                        development curriculum requirements.
-                    </p>
-                    <div class="project-tags">
-                        <span>PHP</span><span>Web</span
-                        ><span>School Project</span>
-                    </div>
-                </a>
-                <a
-                    class="project-card"
-                    data-project-id="figureiie"
-                    href="https://github.com/wahyuatmaja3/figureiie"
-                    target="_blank"
-                >
-                    <div class="project-glow"></div>
-                    <div class="project-header">
-                        <div class="project-lang blade">Blade</div>
-                        <svg
-                            class="project-arrow"
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <path d="M7 17L17 7M7 7h10v10" />
-                        </svg>
-                    </div>
-                    <h3 class="project-name">figureiie</h3>
-                    <p class="project-desc">
-                        A Laravel Blade project showcasing full-stack web
-                        development capabilities.
-                    </p>
-                    <div class="project-tags">
-                        <span>Blade</span><span>Laravel</span><span>PHP</span>
-                    </div>
-                </a>
-                <a
-                    class="project-card"
-                    data-project-id="pendaftaran-siswa-smktag"
-                    href="https://github.com/wahyuatmaja3/pendaftaran-siswa-smktag"
-                    target="_blank"
-                >
-                    <div class="project-glow"></div>
-                    <div class="project-header">
-                        <div class="project-lang dart">Dart</div>
-                        <svg
-                            class="project-arrow"
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <path d="M7 17L17 7M7 7h10v10" />
-                        </svg>
-                    </div>
-                    <h3 class="project-name">pendaftaran-siswa-smktag</h3>
-                    <p class="project-desc">
-                        Student registration system for SMK TAG, built with
-                        Flutter/Dart for efficient enrollment management.
-                    </p>
-                    <div class="project-tags">
-                        <span>Dart</span><span>Flutter</span
-                        ><span>Education</span>
-                    </div>
-                </a>
-                <a
-                    class="project-card"
-                    data-project-id="yakusoku"
-                    href="https://github.com/wahyuatmaja3/yakusoku"
-                    target="_blank"
-                >
-                    <div class="project-glow"></div>
-                    <div class="project-header">
-                        <div class="project-lang js">JavaScript</div>
-                        <svg
-                            class="project-arrow"
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <path d="M7 17L17 7M7 7h10v10" />
-                        </svg>
-                    </div>
-                    <h3 class="project-name">yakusoku</h3>
-                    <p class="project-desc">
-                        A JavaScript project exploring modern web development
-                        patterns and interactions.
-                    </p>
-                    <div class="project-tags">
-                        <span>JavaScript</span><span>Web</span>
-                    </div>
-                </a>
-                <a
-                    class="project-card featured"
-                    data-project-id="artha"
-                    href="https://github.com/wahyuatmaja3/artha"
-                    target="_blank"
-                >
-                    <div class="project-glow"></div>
-                    <div class="project-badge">Featured</div>
-                    <div class="project-header">
-                        <div class="project-lang dart">Dart</div>
-                        <svg
-                            class="project-arrow"
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <path d="M7 17L17 7M7 7h10v10" />
-                        </svg>
-                    </div>
-                    <h3 class="project-name">artha</h3>
-                    <p class="project-desc">
-                        A Flutter/Dart application that has gained community
-                        interest with 1 fork. Built for real-world usage.
-                    </p>
-                    <div class="project-tags">
-                        <span>Dart</span><span>Flutter</span><span>Mobile</span>
-                    </div>
-                </a>
-            </div>
-            <div class="projects-cta">
-                <a
-                    href="https://github.com/wahyuatmaja3?tab=repositories"
-                    target="_blank"
-                    class="btn-outline"
-                >
-                    View All 19 Repositories
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path
-                            d="M3 8h10M9 4l4 4-4 4"
-                            stroke="currentColor"
-                            stroke-width="1.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        />
-                    </svg>
-                </a>
-            </div>
-        </section>
 
-        <!-- ======= CONTACT ======= -->
-        <section id="contact">
-            <div class="section-header">
-                <span class="section-tag">Contact</span>
-                <h2 class="section-title">
-                    Let's Build<br /><span class="gradient-text"
-                        >Something Together</span
-                    >
-                </h2>
-                <p class="section-desc">
-                    Whether it's a new mobile app, a web project, or just a
-                    chat—I'm always up for it.
-                </p>
-            </div>
-            <div class="contact-links">
-                <a
-                    class="contact-card"
-                    href="mailto:wahyusou@gmail.com"
-                    id="contact-email"
-                >
-                    <div class="contact-icon">
-                        <svg
-                            width="28"
-                            height="28"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.5"
-                        >
-                            <rect x="2" y="4" width="20" height="16" rx="2" />
-                            <path d="M22 7l-10 7L2 7" />
-                        </svg>
+                    <h1 class="hero__title" data-flip-text>Wahyu Tri Atmaja</h1>
+
+                    <p class="hero__roles" data-reveal>
+                        <span class="hero__roles-static">I&nbsp;am a</span>
+                        <span class="reel" id="roleReel" data-reel>
+                            <span class="reel__track" data-reel-track>
+                                <span class="reel__item">Flutter Engineer</span>
+                                <span class="reel__item">Mobile Developer</span>
+                                <span class="reel__item">Desktop Maintainer</span>
+                                <span class="reel__item">Dart Craftsman</span>
+                            </span>
+                        </span>
+                    </p>
+
+                    <p class="hero__desc" data-reveal>
+                        I help product teams ship reliable mobile experiences faster with
+                        Flutter, backed by 3+ years of professional delivery and hands-on
+                        maintenance of legacy desktop systems.
+                    </p>
+
+                    <div class="hero__actions" data-reveal>
+                        <a class="btn btn--primary magnetic" href="#projects" data-magnetic>
+                            View selected work
+                            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </a>
+                        <a class="btn btn--ghost magnetic" href="https://github.com/wahyuatmaja3" target="_blank" rel="noopener noreferrer" data-magnetic>
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z" />
+                            </svg>
+                            GitHub
+                        </a>
                     </div>
-                    <div class="contact-info">
-                        <span class="contact-label">Email</span>
-                        <span class="contact-value">wahyusou@gmail.com</span>
-                    </div>
-                    <svg
-                        class="contact-arrow"
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
-                        <path d="M7 17L17 7M7 7h10v10" />
-                    </svg>
+
+                    <dl class="hero__facts" data-reveal>
+                        <div class="fact">
+                            <dt>Based in</dt>
+                            <dd>Surabaya, Indonesia</dd>
+                        </div>
+                        <div class="fact">
+                            <dt>Experience</dt>
+                            <dd>3+ years, professional</dd>
+                        </div>
+                        <div class="fact">
+                            <dt>Focus</dt>
+                            <dd>Mobile app delivery</dd>
+                        </div>
+                    </dl>
+                </div>
+
+                <a class="hero__scroll" href="#about" aria-label="Scroll to About">
+                    <span class="hero__scroll-line" aria-hidden="true"></span>
+                    Scroll
                 </a>
-                <a
-                    class="contact-card"
-                    href="https://github.com/wahyuatmaja3"
-                    target="_blank"
-                    id="contact-github"
-                >
-                    <div class="contact-icon">
-                        <svg
-                            width="28"
-                            height="28"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
+            </section>
+
+            <!-- ======= ABOUT ======= -->
+            <section class="section" id="about">
+                <div class="shell">
+                    <header class="section__head" data-reveal>
+                        <p class="eyebrow"><span>01</span> About</p>
+                        <h2 class="section__title">Who&nbsp;am&nbsp;I</h2>
+                    </header>
+
+                    <div class="about">
+                        <div class="about__lede" data-reveal>
+                            <p>
+                                Mobile &amp; Desktop Developer dari Surabaya dengan 3+ tahun
+                                pengalaman profesional.
+                            </p>
+                            <p>
+                                Saya fokus pada pengembangan aplikasi mobile menggunakan
+                                <em>Flutter</em> dan maintenance sistem desktop dengan
+                                <em>Delphi</em>. Passionate tentang clean code dan user
+                                experience.
+                            </p>
+                        </div>
+
+                        <div class="about__body" data-reveal>
+                            <p>
+                                Setelah lulus SMK jurusan Rekayasa Perangkat Lunak, saya
+                                bergabung di sebuah software house di Surabaya. Tahun ketiga
+                                saya memegang tanggung jawab penuh untuk program mobile app
+                                baru yang sedang dikembangkan, sekaligus memelihara
+                                program desktop lama yang sudah berjalan dalam pemakaian
+                                harian.
+                            </p>
+                            <p>
+                                Dua peran itu membentuk cara kerja saya: iterasi cepat untuk
+                                fitur baru, dan debugging yang teliti untuk sistem yang
+                                tidak boleh down.
+                            </p>
+                        </div>
+                    </div>
+
+                    <ul class="stats" data-reveal>
+                        <li class="stat">
+                            <span class="stat__num" data-count="3" data-suffix="+">3+</span>
+                            <span class="stat__label">Years experience</span>
+                        </li>
+                        <li class="stat">
+                            <span class="stat__num" data-count="19">19</span>
+                            <span class="stat__label">Public repositories</span>
+                        </li>
+                        <li class="stat">
+                            <span class="stat__num" data-count="2">2</span>
+                            <span class="stat__label">Active roles</span>
+                        </li>
+                        <li class="stat">
+                            <span class="stat__num">1</span>
+                            <span class="stat__label">City — Surabaya</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- ======= SKILLS ======= -->
+            <section class="section" id="skills">
+                <div class="shell">
+                    <header class="section__head" data-reveal>
+                        <p class="eyebrow"><span>02</span> Stack</p>
+                        <h2 class="section__title">Tech I&nbsp;reach&nbsp;for</h2>
+                        <p class="section__desc">
+                            Drag the rows, or focus and use ← →. Levels are self-assessed
+                            and honest — I use every one of these in production work.
+                        </p>
+                    </header>
+                </div>
+
+                <!-- Draggable marquee (ObsidianUI draggable-marquee) -->
+                <div class="marquee" data-marquee tabindex="0" role="region" aria-label="Skill list. Drag, or use the left and right arrow keys.">
+                    <div class="marquee__track" data-marquee-track>
+                        <div class="marquee__set">
+                            <span class="skill" data-skill data-level="92"><span class="skill__name">Flutter</span><span class="skill__level">92</span><span class="ticks" data-ticks="5" data-filled="5" aria-hidden="true"></span></span>
+                            <span class="skill" data-skill data-level="90"><span class="skill__name">Dart</span><span class="skill__level">90</span><span class="ticks" data-ticks="5" data-filled="4" aria-hidden="true"></span></span>
+                            <span class="skill" data-skill data-level="90"><span class="skill__name">VS Code</span><span class="skill__level">90</span><span class="ticks" data-ticks="5" data-filled="4" aria-hidden="true"></span></span>
+                            <span class="skill" data-skill data-level="88"><span class="skill__name">Android Studio</span><span class="skill__level">88</span><span class="ticks" data-ticks="5" data-filled="4" aria-hidden="true"></span></span>
+                            <span class="skill" data-skill data-level="85"><span class="skill__name">Git</span><span class="skill__level">85</span><span class="ticks" data-ticks="5" data-filled="4" aria-hidden="true"></span></span>
+                            <span class="skill" data-skill data-level="75"><span class="skill__name">Java</span><span class="skill__level">75</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="marquee marquee--reverse" data-marquee tabindex="0" role="region" aria-label="More skills. Drag, or use the left and right arrow keys.">
+                    <div class="marquee__track" data-marquee-track>
+                        <div class="marquee__set">
+                            <span class="skill" data-skill data-level="70"><span class="skill__name">Pascal</span><span class="skill__level">70</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
+                            <span class="skill" data-skill data-level="70"><span class="skill__name">Delphi 5</span><span class="skill__level">70</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
+                            <span class="skill" data-skill data-level="65"><span class="skill__name">Python</span><span class="skill__level">65</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
+                            <span class="skill" data-skill data-level="55"><span class="skill__name">Go</span><span class="skill__level">55</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
+                            <span class="skill" data-skill data-level="70"><span class="skill__name">Laravel</span><span class="skill__level">70</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
+                            <span class="skill" data-skill data-level="65"><span class="skill__name">PHP</span><span class="skill__level">65</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="shell">
+                    <ul class="stack-groups" data-reveal>
+                        <li>
+                            <h3>Languages</h3>
+                            <p>Dart, Java, Pascal, Python, Go, PHP</p>
+                        </li>
+                        <li>
+                            <h3>Frameworks</h3>
+                            <p>Flutter, Laravel, Delphi 5</p>
+                        </li>
+                        <li>
+                            <h3>Tools</h3>
+                            <p>Git, Android Studio, VS Code</p>
+                        </li>
+                        <li>
+                            <h3>Practice</h3>
+                            <p>Clean code, code review, UX awareness</p>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- ======= PROJECTS ======= -->
+            <section class="section" id="projects">
+                <div class="shell">
+                    <header class="section__head" data-reveal>
+                        <p class="eyebrow"><span>03</span> Work</p>
+                        <h2 class="section__title">Selected&nbsp;projects</h2>
+                        <p class="section__desc">
+                            Six of nineteen public repositories. Select a card to read the
+                            case study, or open the repository directly.
+                        </p>
+                    </header>
+
+                    <ul class="projects" data-reveal>
+                        <li class="projects__item projects__item--wide" data-tilt data-tilt-glare>
+                            <article class="pcard pcard--featured">
+                                <span class="pcard__badge">Featured</span>
+                                <div class="pcard__body">
+                                    <p class="pcard__lang">Dart · Flutter</p>
+                                    <h3 class="pcard__name">artha</h3>
+                                    <p class="pcard__desc">
+                                        Aplikasi Flutter yang dipakai untuk kebutuhan nyata dan
+                                        berhasil menarik minat komunitas.
+                                    </p>
+                                    <ul class="pcard__tags">
+                                        <li>Dart</li>
+                                        <li>Flutter</li>
+                                        <li>Mobile</li>
+                                    </ul>
+                                </div>
+                                <div class="pcard__actions">
+                                    <button class="pcard__cta" type="button" data-case-study="artha">
+                                        Read case study
+                                    </button>
+                                    <a class="pcard__icon-link" href="https://github.com/wahyuatmaja3/artha" target="_blank" rel="noopener noreferrer" aria-label="artha on GitHub">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                            <path d="M7 17L17 7M7 7h10v10" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </a>
+                                </div>
+                            </article>
+                        </li>
+
+                        <li class="projects__item" data-tilt data-tilt-glare>
+                            <article class="pcard">
+                                <div class="pcard__body">
+                                    <p class="pcard__lang">Dart · Flutter</p>
+                                    <h3 class="pcard__name">pendaftaran-siswa-smktag</h3>
+                                    <p class="pcard__desc">
+                                        Sistem pendaftaran siswa berbasis Flutter untuk
+                                        mempermudah proses input dan tracking data
+                                        enrollment.
+                                    </p>
+                                    <ul class="pcard__tags">
+                                        <li>Dart</li>
+                                        <li>Flutter</li>
+                                        <li>Education</li>
+                                    </ul>
+                                </div>
+                                <div class="pcard__actions">
+                                    <button class="pcard__cta" type="button" data-case-study="pendaftaran-siswa-smktag">
+                                        Read case study
+                                    </button>
+                                    <a class="pcard__icon-link" href="https://github.com/wahyuatmaja3/pendaftaran-siswa-smktag" target="_blank" rel="noopener noreferrer" aria-label="pendaftaran-siswa-smktag on GitHub">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                            <path d="M7 17L17 7M7 7h10v10" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </a>
+                                </div>
+                            </article>
+                        </li>
+
+                        <li class="projects__item" data-tilt data-tilt-glare>
+                            <article class="pcard">
+                                <div class="pcard__body">
+                                    <p class="pcard__lang">PHP · Web</p>
+                                    <h3 class="pcard__name">kyros</h3>
+                                    <p class="pcard__desc">
+                                        Project web berbasis PHP yang dibangun untuk kebutuhan
+                                        pembelajaran sekaligus melatih praktik arsitektur
+                                        backend dasar.
+                                    </p>
+                                    <ul class="pcard__tags">
+                                        <li>PHP</li>
+                                        <li>Web</li>
+                                        <li>School Project</li>
+                                    </ul>
+                                </div>
+                                <div class="pcard__actions">
+                                    <button class="pcard__cta" type="button" data-case-study="kyros">
+                                        Read case study
+                                    </button>
+                                    <a class="pcard__icon-link" href="https://github.com/wahyuatmaja3/kyros" target="_blank" rel="noopener noreferrer" aria-label="kyros on GitHub">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                            <path d="M7 17L17 7M7 7h10v10" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </a>
+                                </div>
+                            </article>
+                        </li>
+
+                        <li class="projects__item" data-tilt data-tilt-glare>
+                            <article class="pcard">
+                                <div class="pcard__body">
+                                    <p class="pcard__lang">Blade · Laravel</p>
+                                    <h3 class="pcard__name">figureiie</h3>
+                                    <p class="pcard__desc">
+                                        Aplikasi Laravel Blade untuk menunjukkan kapabilitas
+                                        full-stack web dari sisi rendering server hingga
+                                        tampilan UI.
+                                    </p>
+                                    <ul class="pcard__tags">
+                                        <li>Blade</li>
+                                        <li>Laravel</li>
+                                        <li>PHP</li>
+                                    </ul>
+                                </div>
+                                <div class="pcard__actions">
+                                    <button class="pcard__cta" type="button" data-case-study="figureiie">
+                                        Read case study
+                                    </button>
+                                    <a class="pcard__icon-link" href="https://github.com/wahyuatmaja3/figureiie" target="_blank" rel="noopener noreferrer" aria-label="figureiie on GitHub">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                            <path d="M7 17L17 7M7 7h10v10" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </a>
+                                </div>
+                            </article>
+                        </li>
+
+                        <li class="projects__item" data-tilt data-tilt-glare>
+                            <article class="pcard">
+                                <div class="pcard__body">
+                                    <p class="pcard__lang">HTML · CSS</p>
+                                    <h3 class="pcard__name">deiji-marketplace</h3>
+                                    <p class="pcard__desc">
+                                        Marketplace web app yang fokus ke experience belanja
+                                        cepat dengan flow produk, katalog, dan checkout
+                                        yang sederhana.
+                                    </p>
+                                    <ul class="pcard__tags">
+                                        <li>HTML</li>
+                                        <li>CSS</li>
+                                        <li>E-Commerce</li>
+                                    </ul>
+                                </div>
+                                <div class="pcard__actions">
+                                    <button class="pcard__cta" type="button" data-case-study="deiji-marketplace">
+                                        Read case study
+                                    </button>
+                                    <a class="pcard__icon-link" href="https://github.com/wahyuatmaja3/deiji-marketplace" target="_blank" rel="noopener noreferrer" aria-label="deiji-marketplace on GitHub">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                            <path d="M7 17L17 7M7 7h10v10" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </a>
+                                </div>
+                            </article>
+                        </li>
+
+                        <li class="projects__item" data-tilt data-tilt-glare>
+                            <article class="pcard">
+                                <div class="pcard__body">
+                                    <p class="pcard__lang">JavaScript</p>
+                                    <h3 class="pcard__name">yakusoku</h3>
+                                    <p class="pcard__desc">
+                                        Eksperimen JavaScript untuk mengeksplor pola interaksi
+                                        modern dan pengalaman pengguna yang lebih hidup.
+                                    </p>
+                                    <ul class="pcard__tags">
+                                        <li>JavaScript</li>
+                                        <li>Web</li>
+                                    </ul>
+                                </div>
+                                <div class="pcard__actions">
+                                    <button class="pcard__cta" type="button" data-case-study="yakusoku">
+                                        Read case study
+                                    </button>
+                                    <a class="pcard__icon-link" href="https://github.com/wahyuatmaja3/yakusoku" target="_blank" rel="noopener noreferrer" aria-label="yakusoku on GitHub">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                            <path d="M7 17L17 7M7 7h10v10" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </a>
+                                </div>
+                            </article>
+                        </li>
+                    </ul>
+
+                    <div class="projects__more" data-reveal>
+                        <a class="btn btn--outline" href="https://github.com/wahyuatmaja3?tab=repositories" target="_blank" rel="noopener noreferrer" data-magnetic>
+                            View all 19 repositories
+                            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ======= PROCESS (Bencho carousel) ======= -->
+            <section class="section" id="process">
+                <div class="shell">
+                    <header class="section__head" data-reveal>
+                        <p class="eyebrow"><span>04</span> Process</p>
+                        <h2 class="section__title section__title--display">
+                            How I <em>work</em>
+                        </h2>
+                        <p class="section__desc">
+                            The same loop on every project, whether it ships in a week
+                            or gets maintained for years.
+                        </p>
+                    </header>
+
+                    <div class="carousel" data-carousel data-reveal>
+                        <div class="carousel__viewport" data-carousel-viewport>
+                            <ul class="carousel__track" data-carousel-track aria-label="Working process, five steps">
+                                <li class="carousel__slide">
+                                    <p class="carousel__step">01</p>
+                                    <h3 class="carousel__title">Read the room</h3>
+                                    <p class="carousel__body">
+                                        I start by finding the real constraint. Who uses this,
+                                        what breaks today, and what "better" actually means
+                                        for the person on the other side of the screen.
+                                    </p>
+                                </li>
+                                <li class="carousel__slide">
+                                    <p class="carousel__step">02</p>
+                                    <h3 class="carousel__title">Cut the scope</h3>
+                                    <p class="carousel__body">
+                                        The first version is the smallest thing that can
+                                        honestly answer the brief. Everything else gets
+                                        parked, not quietly buried in the backlog.
+                                    </p>
+                                </li>
+                                <li class="carousel__slide">
+                                    <p class="carousel__step">03</p>
+                                    <h3 class="carousel__title">Build in the open</h3>
+                                    <p class="carousel__body">
+                                        Short cycles, something running early, and a demo
+                                        before the feature is finished. Problems are far
+                                        cheaper to find on a working build.
+                                    </p>
+                                </li>
+                                <li class="carousel__slide">
+                                    <p class="carousel__step">04</p>
+                                    <h3 class="carousel__title">Measure, then trim</h3>
+                                    <p class="carousel__body">
+                                        I look at what people actually touch and take the
+                                        friction out of it. Screens get smaller, code gets
+                                        shorter, and both read better.
+                                    </p>
+                                </li>
+                                <li class="carousel__slide">
+                                    <p class="carousel__step">05</p>
+                                    <h3 class="carousel__title">Keep it standing</h3>
+                                    <p class="carousel__body">
+                                        Launch is the midpoint, not the finish line. I stay on
+                                        the apps I ship, including the older desktop systems
+                                        that still need care.
+                                    </p>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="carousel__controls">
+                            <button
+                                class="carousel__btn magnetic"
+                                type="button"
+                                data-carousel-prev
+                                data-magnetic
+                                aria-label="Previous step"
+                            >
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                    <path d="M13 8H3M7 4L3 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </button>
+
+                            <div class="carousel__dots" data-carousel-dots></div>
+
+                            <button
+                                class="carousel__btn magnetic"
+                                type="button"
+                                data-carousel-next
+                                data-magnetic
+                                aria-label="Next step"
+                            >
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ======= CONTACT ======= -->
+            <section class="section section--contact" id="contact">
+                <div class="shell">
+                    <header class="section__head" data-reveal>
+                        <p class="eyebrow"><span>05</span> Contact</p>
+                        <h2 class="section__title section__title--display">
+                            Let's build<br />something&nbsp;together
+                        </h2>
+                        <p class="section__desc">
+                            Whether it's a new mobile app, a web project, or just a chat —
+                            I'm always up for it.
+                        </p>
+                    </header>
+
+                    <!-- Slide to confirm (Bencho slide-to-confirm) -->
+                    <div class="slide" data-reveal>
+                        <div
+                            class="slide__track"
+                            id="slideTrack"
+                            role="slider"
+                            tabindex="0"
+                            aria-label="Slide to compose an email to Wahyu"
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                            aria-valuenow="0"
+                            aria-valuetext="Slide the handle to the right to compose an email"
                         >
-                            <path
-                                d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"
-                            />
-                        </svg>
+                            <span class="slide__fill" id="slideFill" aria-hidden="true"></span>
+                            <span class="slide__label" id="slideLabel" aria-hidden="true">Slide to say hello</span>
+                            <span class="slide__handle" id="slideHandle" aria-hidden="true">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </span>
+                        </div>
+                        <p class="slide__fallback">
+                            Or just email me directly at
+                            <a href="mailto:wahyusou@gmail.com" data-copy-email="wahyusou@gmail.com">wahyusou@gmail.com</a>
+                        </p>
                     </div>
-                    <div class="contact-info">
-                        <span class="contact-label">GitHub</span>
-                        <span class="contact-value">wahyuatmaja3</span>
+
+                    <!-- Draggable glass bubble (Bencho glass-bubble) -->
+                    <div class="bubble" data-bubble aria-hidden="true">
+                        <span class="bubble__orb"></span>
+                        <span class="bubble__sheen"></span>
                     </div>
-                    <svg
-                        class="contact-arrow"
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
-                        <path d="M7 17L17 7M7 7h10v10" />
-                    </svg>
-                </a>
-                <a
-                    class="contact-card"
-                    href="https://id.linkedin.com/in/wahyu-tri-atmaja-642207376"
-                    target="_blank"
-                    id="contact-linkedin"
-                >
-                    <div class="contact-icon">
-                        <svg
-                            width="28"
-                            height="28"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                        >
-                            <path
-                                d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
-                            />
-                        </svg>
-                    </div>
-                    <div class="contact-info">
-                        <span class="contact-label">LinkedIn</span>
-                        <span class="contact-value">Wahyu Tri Atmaja</span>
-                    </div>
-                    <svg
-                        class="contact-arrow"
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
-                        <path d="M7 17L17 7M7 7h10v10" />
-                    </svg>
-                </a>
-            </div>
-        </section>
+
+                    <ul class="channels" data-reveal>
+                        <li>
+                            <a class="channel magnetic" href="mailto:wahyusou@gmail.com" data-magnetic data-copy-email="wahyusou@gmail.com">
+                                <span class="channel__label">Email</span>
+                                <span class="channel__value" data-copy-label>wahyusou@gmail.com</span>
+                                <span class="channel__hint" data-copy-hint>Copy</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="channel magnetic" href="https://github.com/wahyuatmaja3" target="_blank" rel="noopener noreferrer" data-magnetic>
+                                <span class="channel__label">GitHub</span>
+                                <span class="channel__value">wahyuatmaja3</span>
+                                <span class="channel__hint">19 repos</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="channel magnetic" href="https://id.linkedin.com/in/wahyu-tri-atmaja-642207376" target="_blank" rel="noopener noreferrer" data-magnetic>
+                                <span class="channel__label">LinkedIn</span>
+                                <span class="channel__value">Wahyu Tri Atmaja</span>
+                                <span class="channel__hint">Connect</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+        </main>
 
         <!-- ======= FOOTER ======= -->
-        <footer>
-            <div class="footer-inner">
-                <span class="footer-logo"
-                    >WTA<span class="accent">.</span></span
-                >
-                <p>
-                    Designed &amp; Built by Wahyu Tri Atmaja · Surabaya,
-                    Indonesia · 2026
-                </p>
-                <div class="footer-socials">
-                    <a
-                        href="https://github.com/wahyuatmaja3"
-                        target="_blank"
-                        aria-label="GitHub"
-                    >
-                        <svg
-                            width="18"
-                            height="18"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                        >
-                            <path
-                                d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"
-                            />
+        <footer class="footer">
+            <div class="shell footer__inner">
+                <div class="footer__col">
+                    <span class="footer__logo">WTA<span class="accent">.</span></span>
+                    <p class="footer__note">
+                        Designed &amp; built by Wahyu Tri Atmaja<br />
+                        Surabaya, Indonesia · 2026
+                    </p>
+                </div>
+
+                <div class="footer__col">
+                    <p class="footer__label">Colophon</p>
+                    <p class="footer__note">
+                        Vanilla HTML, CSS &amp; JavaScript. No build step, no framework,
+                        no tracking.
+                    </p>
+                </div>
+
+                <div class="footer__col footer__col--end">
+                    <!-- Visitor chip (ObsidianUI visitor-count, adapted: no backend) -->
+                    <p class="visits" id="visitChip" role="status">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                            <path d="M1.5 12S5 5.5 12 5.5 22.5 12 22.5 12 19 18.5 12 18.5 1.5 12 1.5 12z" />
+                            <circle cx="12" cy="12" r="3" />
                         </svg>
-                    </a>
-                    <a href="mailto:wahyusou@gmail.com" aria-label="Email">
-                        <svg
-                            width="18"
-                            height="18"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <rect x="2" y="4" width="20" height="16" rx="2" />
-                            <path d="M22 7l-10 7L2 7" />
-                        </svg>
-                    </a>
+                        <span id="visitCount">—</span>
+                        <span id="visitNoun">visits</span>
+                    </p>
+                    <a class="btn btn--sm btn--outline" href="#hero" data-magnetic>Back to top ↑</a>
                 </div>
             </div>
         </footer>
 
-        <div class="case-study-modal" id="caseStudyModal" aria-hidden="true">
-            <div class="case-study-backdrop" data-close-case-study></div>
+        <!-- ======= COMMAND BAR (Bencho command-bar) ======= -->
+        <div class="cmd" id="cmd" aria-hidden="true">
+            <div class="cmd__backdrop" data-cmd-close></div>
+            <div class="cmd__dialog" role="dialog" aria-modal="true" aria-label="Command menu">
+                <div class="cmd__input-row">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <circle cx="11" cy="11" r="7" />
+                        <path d="M20 20l-3.5-3.5" stroke-linecap="round" />
+                    </svg>
+                    <input
+                        type="text"
+                        id="cmdInput"
+                        class="cmd__input"
+                        placeholder="Jump to a section, or run an action…"
+                        autocomplete="off"
+                        spellcheck="false"
+                        role="combobox"
+                        aria-expanded="true"
+                        aria-controls="cmdList"
+                        aria-autocomplete="list"
+                    />
+                    <kbd class="kbd">Esc</kbd>
+                </div>
+                <ul class="cmd__list" id="cmdList" role="listbox" aria-label="Results"></ul>
+                <div class="cmd__footer">
+                    <span><kbd class="kbd">↑</kbd><kbd class="kbd">↓</kbd> Navigate</span>
+                    <span><kbd class="kbd">↵</kbd> Select</span>
+                    <span><kbd class="kbd">Esc</kbd> Close</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======= CASE STUDY SHEET (ObsidianUI sheet pattern) ======= -->
+        <div class="sheet" id="sheet" aria-hidden="true">
+            <div class="sheet__backdrop" data-sheet-close></div>
             <div
-                class="case-study-dialog"
+                class="sheet__panel"
                 role="dialog"
                 aria-modal="true"
-                aria-labelledby="caseStudyTitle"
-                aria-describedby="caseStudySummary"
+                aria-labelledby="sheetTitle"
+                aria-describedby="sheetSummary"
             >
-                <button
-                    class="case-study-close"
-                    id="caseStudyClose"
-                    type="button"
-                    aria-label="Close case study"
-                >
-                    ✕
-                </button>
-                <p class="case-study-kicker">Interactive Case Study</p>
-                <h3 class="case-study-title" id="caseStudyTitle"></h3>
-                <p class="case-study-summary" id="caseStudySummary"></p>
+                <div class="sheet__grabber" aria-hidden="true"></div>
+                <header class="sheet__head">
+                    <div>
+                        <p class="sheet__kicker">Case study</p>
+                        <h3 class="sheet__title" id="sheetTitle"></h3>
+                    </div>
+                    <button class="sheet__close" id="sheetClose" type="button" aria-label="Close case study">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                            <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round" />
+                        </svg>
+                    </button>
+                </header>
 
-                <div class="case-study-grid">
+                <p class="sheet__summary" id="sheetSummary"></p>
+
+                <div class="sheet__grid">
                     <section>
                         <h4>Problem</h4>
-                        <p id="caseStudyProblem"></p>
+                        <p id="sheetProblem"></p>
                     </section>
                     <section>
-                        <h4>Solution</h4>
-                        <p id="caseStudySolution"></p>
+                        <h4>Approach</h4>
+                        <p id="sheetSolution"></p>
                     </section>
                 </div>
 
-                <section class="case-study-stack-block">
+                <section>
                     <h4>Stack</h4>
-                    <div class="case-study-stack" id="caseStudyStack"></div>
+                    <ul class="sheet__stack" id="sheetStack"></ul>
                 </section>
 
-                <section class="case-study-highlights-block">
+                <section>
                     <h4>Highlights</h4>
-                    <ul class="case-study-highlights" id="caseStudyHighlights"></ul>
+                    <ul class="sheet__highlights" id="sheetHighlights"></ul>
                 </section>
 
-                <div class="case-study-actions">
-                    <a
-                        class="btn-outline"
-                        id="caseStudyRepo"
-                        href="#"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        View on GitHub
-                    </a>
-                    <a
-                        class="btn-primary"
-                        id="caseStudyDemo"
-                        href="#"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        Open Demo
-                    </a>
-                </div>
+                <footer class="sheet__actions">
+                    <a class="btn btn--ghost" id="sheetRepo" href="#" target="_blank" rel="noopener noreferrer">View repository</a>
+                    <a class="btn btn--primary" id="sheetGitHub" href="#" target="_blank" rel="noopener noreferrer">Open on GitHub</a>
+                </footer>
             </div>
         </div>
 
