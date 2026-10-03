@@ -2173,9 +2173,6 @@ ol {
     .preloader {
         display: none;
     }
-    .flip-char {
-        opacity: 1;
-    }
     .reel__track {
         animation: none;
     }
@@ -2210,6 +2207,15 @@ ol {
     body {
         background: #fff;
         color: #000;
+    }
+    /* print has no pointer, so the wordmark can never be painted
+       to the real text underneath it rather than printing an empty box */
+    .tech-text__canvas {
+        display: none !important;
+    }
+    .hero__title[data-tech-text].is-canvas {
+        color: #000;
+        visibility: visible;
     }
     .section {
         padding-block: 1.5rem;
