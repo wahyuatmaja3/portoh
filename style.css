@@ -3,11 +3,12 @@
    Design system: 2 themes (obsidian / prism), token driven, no build step.
 
    Patterns ported to vanilla:
-     ObsidianUI  · loaders-gooey-blobs, click-spark, flip-text,
-                  draggable-marquee, raised-button, sheet
+     ObsidianUI  · loaders-gooey-blobs, click-spark, raised-button, sheet
      Bencho      · command-bar, tilt-card, magnetic-button, progress-ticks,
-                  inline-confirm, liquid-toggle, slide-to-confirm
+                   inline-confirm, liquid-toggle, slide-to-confirm
+     reactbits   · gradual-blur, tech-text, flex-carousel, target-cursor
    ========================================================================== */
+
 
 /* ---------------------------------------------------------------- tokens -- */
 :root {
@@ -1075,31 +1076,21 @@ ol {
 }
 
 /* ----------------------------------------------------------------- skills -- */
-.marquee {
+.flex-carousel {
     position: relative;
     overflow: hidden;
     padding-block: var(--sp-3);
-    cursor: grab;
     outline-offset: 4px;
     /* fade the edges so items enter and leave gracefully */
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
     mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
 }
 
-.marquee:active {
-    cursor: grabbing;
-}
-
-.marquee__track {
+.flex-carousel__track {
     display: flex;
     width: max-content;
-    gap: var(--marquee-gap, var(--sp-3));
+    gap: var(--fc-gap, var(--sp-3));
     will-change: transform;
-}
-
-.marquee__set {
-    display: flex;
-    gap: var(--marquee-gap, var(--sp-3));
 }
 
 .skill {
@@ -1158,17 +1149,18 @@ ol {
     transform: scaleY(1.25);
 }
 
-/* native scroll fallback for reduced motion */
-@media (prefers-reduced-motion: reduce) {
-    .marquee {
+/* native scroll fallback: reduced motion, and touch pointers that cannot hover
+   to pause the rail anyway get a strip they can swipe instead */
+@media (hover: none), (prefers-reduced-motion: reduce) {
+    .flex-carousel {
         overflow-x: auto;
         -webkit-mask-image: none;
         mask-image: none;
     }
-    .marquee__track {
+    .flex-carousel__track {
         transform: none !important;
     }
-    .marquee__set + .marquee__set {
+    .flex-carousel__item.is-clone {
         display: none;
     }
 }
@@ -2211,7 +2203,7 @@ ol {
     .hero__scroll,
     .cmd,
     .sheet,
-    .marquee,
+    .flex-carousel,
     .carousel__controls {
         display: none !important;
     }

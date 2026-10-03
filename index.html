@@ -268,36 +268,27 @@
                         <p class="eyebrow"><span>02</span> Stack</p>
                         <h2 class="section__title">Tech I&nbsp;reach&nbsp;for</h2>
                         <p class="section__desc">
-                            Drag the rows, or focus and use ← →. Levels are self-assessed
+                            The rail keeps moving on its own. Levels are self-assessed
                             and honest — I use every one of these in production work.
                         </p>
                     </header>
                 </div>
 
-                <!-- Draggable marquee (ObsidianUI draggable-marquee) -->
-                <div class="marquee" data-marquee tabindex="0" role="region" aria-label="Skill list. Drag, or use the left and right arrow keys.">
-                    <div class="marquee__track" data-marquee-track>
-                        <div class="marquee__set">
-                            <span class="skill" data-skill data-level="92"><span class="skill__name">Flutter</span><span class="skill__level">92</span><span class="ticks" data-ticks="5" data-filled="5" aria-hidden="true"></span></span>
-                            <span class="skill" data-skill data-level="90"><span class="skill__name">Dart</span><span class="skill__level">90</span><span class="ticks" data-ticks="5" data-filled="4" aria-hidden="true"></span></span>
-                            <span class="skill" data-skill data-level="90"><span class="skill__name">VS Code</span><span class="skill__level">90</span><span class="ticks" data-ticks="5" data-filled="4" aria-hidden="true"></span></span>
-                            <span class="skill" data-skill data-level="88"><span class="skill__name">Android Studio</span><span class="skill__level">88</span><span class="ticks" data-ticks="5" data-filled="4" aria-hidden="true"></span></span>
-                            <span class="skill" data-skill data-level="85"><span class="skill__name">Git</span><span class="skill__level">85</span><span class="ticks" data-ticks="5" data-filled="4" aria-hidden="true"></span></span>
-                            <span class="skill" data-skill data-level="75"><span class="skill__name">Java</span><span class="skill__level">75</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="marquee marquee--reverse" data-marquee tabindex="0" role="region" aria-label="More skills. Drag, or use the left and right arrow keys.">
-                    <div class="marquee__track" data-marquee-track>
-                        <div class="marquee__set">
-                            <span class="skill" data-skill data-level="70"><span class="skill__name">Pascal</span><span class="skill__level">70</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
-                            <span class="skill" data-skill data-level="70"><span class="skill__name">Delphi 5</span><span class="skill__level">70</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
-                            <span class="skill" data-skill data-level="65"><span class="skill__name">Python</span><span class="skill__level">65</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
-                            <span class="skill" data-skill data-level="55"><span class="skill__name">Go</span><span class="skill__level">55</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
-                            <span class="skill" data-skill data-level="70"><span class="skill__name">Laravel</span><span class="skill__level">70</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
-                            <span class="skill" data-skill data-level="65"><span class="skill__name">PHP</span><span class="skill__level">65</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
-                        </div>
+                <!-- Continuous skill rail (reactbits FlexCarousel) -->
+                <div class="flex-carousel" data-flex-carousel tabindex="0" role="region" aria-label="Skills I reach for. Hover to pause, or focus and use the left and right arrow keys.">
+                    <div class="flex-carousel__track" data-flex-carousel-track>
+                        <span class="skill" data-skill data-level="92"><span class="skill__name">Flutter</span><span class="skill__level">92</span><span class="ticks" data-ticks="5" data-filled="5" aria-hidden="true"></span></span>
+                        <span class="skill" data-skill data-level="90"><span class="skill__name">Dart</span><span class="skill__level">90</span><span class="ticks" data-ticks="5" data-filled="4" aria-hidden="true"></span></span>
+                        <span class="skill" data-skill data-level="90"><span class="skill__name">VS Code</span><span class="skill__level">90</span><span class="ticks" data-ticks="5" data-filled="4" aria-hidden="true"></span></span>
+                        <span class="skill" data-skill data-level="88"><span class="skill__name">Android Studio</span><span class="skill__level">88</span><span class="ticks" data-ticks="5" data-filled="4" aria-hidden="true"></span></span>
+                        <span class="skill" data-skill data-level="85"><span class="skill__name">Git</span><span class="skill__level">85</span><span class="ticks" data-ticks="5" data-filled="4" aria-hidden="true"></span></span>
+                        <span class="skill" data-skill data-level="75"><span class="skill__name">Java</span><span class="skill__level">75</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
+                        <span class="skill" data-skill data-level="70"><span class="skill__name">Pascal</span><span class="skill__level">70</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
+                        <span class="skill" data-skill data-level="70"><span class="skill__name">Delphi 5</span><span class="skill__level">70</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
+                        <span class="skill" data-skill data-level="65"><span class="skill__name">Python</span><span class="skill__level">65</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
+                        <span class="skill" data-skill data-level="55"><span class="skill__name">Go</span><span class="skill__level">55</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
+                        <span class="skill" data-skill data-level="70"><span class="skill__name">Laravel</span><span class="skill__level">70</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
+                        <span class="skill" data-skill data-level="65"><span class="skill__name">PHP</span><span class="skill__level">65</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
                     </div>
                 </div>
 

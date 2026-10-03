@@ -1,6 +1,6 @@
 /* =============================================================================
    PORTOH — main.js
-   Vanilla port of interactive patterns from ObsidianUI + Bencho.
+   Vanilla port of interactive patterns from ObsidianUI + Bencho + reactbits.
    No dependencies, no build step.
    ========================================================================== */
 (function () {
@@ -385,186 +385,167 @@
        DRAGGABLE MARQUEE — auto-scroll + drag with inertia
        Ported from ObsidianUI draggable-marquee (GSAP Draggable -> Pointer Events)
        ------------------------------------------------------------------ */
-    component("draggable-marquee", function () {
-        var roots = document.querySelectorAll("[data-marquee]");
+    component("flex-carousel", function () {
+        var roots = document.querySelectorAll("[data-flex-carousel]");
         if (!roots.length) return;
 
-        roots.forEach(function (marquee) {
-            var track = marquee.querySelector("[data-marquee-track]");
+        roots.forEach(function (root) {
+            var track = root.querySelector("[data-flex-carousel-track]");
             if (!track) return;
 
-            var reverse = marquee.classList.contains("marquee--reverse");
-            var SPEED = 0.55;
-            var THROW_MULTIPLIER = 2.8;
-            var THROW_FRICTION = 0.975;
-            var MAX_THROW = 60;
-            var LOOPS = 3;
+            var VELOCITY = 44; // px per second
+            var EASE = 0.09; // how fast the speed eases toward its target
+            var FILL_RATIO = 2; // track width vs. viewport width
 
-            var setWidth = 0;
-            var x = 0;
-            var throwVelocity = 0;
-            var isDragging = false;
-            var isPointerOver = false;
-            var lastX = 0;
+            // a rail that cannot be paused is a liability: with reduced motion,
+            // or on a pointer that cannot hover, hand over to native scrolling
+            var isStatic =
+                reduceMotion.matches ||
+                !window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+            var items = Array.prototype.slice.call(track.children);
+            if (!items.length) return;
+
+            var offset = 0;
+            var speed = 0;
+            var isPaused = false;
+            var isHidden = false;
             var lastT = 0;
-            var pointerId = null;
-            var offsetX = 0;
             var rafId = null;
 
-            function gap() {
+            function gapPx() {
                 var s = getComputedStyle(track);
                 return parseFloat(s.columnGap || s.gap || 0) || 0;
             }
 
-            function wrapMin() {
-                return -setWidth * 1.02;
+            /* stride = item width + the gap that follows it. Cached per element
+               because items move around the track as they are recycled. */
+            function strideOf(item) {
+                if (!item._fcStride) {
+                    item._fcStride = item.getBoundingClientRect().width + gapPx();
+                }
+                return item._fcStride;
             }
 
-            function wrap(v) {
-                var min = wrapMin();
-                var max = 0;
-                var range = max - min;
-                if (!range) return 0;
-                while (v < min) v += range;
-                while (v > max) v -= range;
-                return v;
+            function cycle() {
+                var total = 0;
+                Array.prototype.forEach.call(track.children, function (el) {
+                    total += strideOf(el);
+                });
+                return total;
             }
 
-            function measure() {
-                var set = track.firstElementChild;
-                if (!set) return;
+            function fill() {
+                // a static strip is natively scrollable, so there is nothing
+                // to fill and no point cloning anything
+                if (isStatic) return;
 
-                // one set + the gap that follows it
-                setWidth = set.getBoundingClientRect().width + gap();
-                if (!setWidth) return;
+                var need = root.clientWidth * FILL_RATIO;
+                var have = cycle();
+                var i = 0;
+                while (have < need && i < items.length * 6) {
+                    var clone = items[i % items.length].cloneNode(true);
+                    clone.classList.add("flex-carousel__item", "is-clone");
+                    // clones exist to fill the rail, never to be read twice
+                    clone.setAttribute("aria-hidden", "true");
+                    clone.removeAttribute("data-skill");
+                    track.appendChild(clone);
+                    have += strideOf(clone);
+                    i++;
+                }
+            }
 
-                var progress = setWidth ? (x - wrapMin()) / (0 - wrapMin()) : 0;
-                x = wrap(wrapMin() + setWidth * (isFinite(progress) ? progress : 0));
-                apply();
+            function normalize() {
+                if (isStatic) return;
+                var total = cycle();
+                if (total) offset = ((offset % total) + total) % total - total;
             }
 
             function apply() {
-                track.style.transform = "translate3d(" + x.toFixed(2) + "px,0,0)";
+                if (isStatic) return;
+                track.style.transform = "translate3d(" + offset.toFixed(2) + "px,0,0)";
             }
 
-            function tick() {
-                if (!isDragging) {
-                    // pause on hover so a chip is readable before the next drag
-                    if (!isPointerOver) {
-                        if (reverse) x += SPEED;
-                        else x -= SPEED;
-                    }
-                    x += throwVelocity;
-                    throwVelocity *= THROW_FRICTION;
-                    if (Math.abs(throwVelocity) < 0.01) throwVelocity = 0;
+            function tick(now) {
+                rafId = requestAnimationFrame(tick);
+
+                var dt = lastT ? Math.min((now - lastT) / 1000, 0.05) : 0.016;
+                lastT = now;
+
+                var target = isPaused ? 0 : VELOCITY;
+                speed += (target - speed) * EASE;
+                if (Math.abs(speed - target) < 0.05) speed = target;
+                offset -= speed * dt;
+
+                // recycle: a fully passed item re-enters on the right, which is
+                // visually identical to never having left
+                var first = track.firstElementChild;
+                while (first && offset <= -strideOf(first)) {
+                    offset += strideOf(first);
+                    track.appendChild(first);
+                    first = track.firstElementChild;
                 }
-                x = wrap(x);
+
                 apply();
-                rafId = requestAnimationFrame(tick);
             }
 
-            function build() {
-                if (reduceMotion.matches) return;
-                var set = track.firstElementChild;
-                if (!set) return;
-                // clone until the track is comfortably wider than the viewport
-                var needed = Math.ceil((marquee.clientWidth * 2) / (set.getBoundingClientRect().width || 1)) + 1;
-                var loops = clamp(needed, LOOPS, 8);
-                for (var i = 1; i < loops; i++) {
-                    var clone = set.cloneNode(true);
-                    // clones are decoration — keep them out of the a11y tree
-                    clone.setAttribute("aria-hidden", "true");
-                    track.appendChild(clone);
+            function measure() {
+                // widths change with the fluid type scale, so re-read them all
+                Array.prototype.forEach.call(track.children, function (el) {
+                    el._fcStride = 0;
+                });
+                normalize();
+                apply();
+            }
+
+            fill();
+            normalize();
+
+            if (!isStatic) {
+                rafId = requestAnimationFrame(tick);
+
+                root.addEventListener("mouseenter", function () {
+                    isPaused = true;
+                });
+                root.addEventListener("mouseleave", function () {
+                    isPaused = false;
+                });
+
+                // keyboard: about a third of the viewport per keypress
+                root.addEventListener("keydown", function (e) {
+                    if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+                    e.preventDefault();
+                    var step = root.clientWidth * 0.33;
+                    offset += e.key === "ArrowLeft" ? step : -step;
+                    normalize();
+                    apply();
+                });
+            }
+            // on a static strip the arrow keys are left to the browser, which
+            // already scrolls a focusable overflow container
+
+            // a backgrounded tab has no business burning frames
+            document.addEventListener("visibilitychange", function () {
+                if (document.hidden) {
+                    if (rafId) cancelAnimationFrame(rafId);
+                    rafId = null;
+                    isHidden = true;
+                } else if (isHidden && !isStatic) {
+                    lastT = 0;
+                    rafId = requestAnimationFrame(tick);
+                    isHidden = false;
                 }
-            }
+            });
 
-            if (reduceMotion.matches) {
-                marquee.setAttribute("aria-disabled", "false");
-            } else {
-                build();
-                measure();
-                rafId = requestAnimationFrame(tick);
-            }
-
-            // re-measure on resize / content reflow
             var resizeRaf = null;
             function scheduleMeasure() {
-                if (reduceMotion.matches) return;
                 if (resizeRaf) cancelAnimationFrame(resizeRaf);
                 resizeRaf = requestAnimationFrame(measure);
             }
             window.addEventListener("resize", scheduleMeasure);
             if ("ResizeObserver" in window) {
-                var ro = new ResizeObserver(scheduleMeasure);
-                ro.observe(track);
+                new ResizeObserver(scheduleMeasure).observe(track);
             }
-
-            marquee.addEventListener("mouseenter", function () {
-                isPointerOver = true;
-            });
-            marquee.addEventListener("mouseleave", function () {
-                isPointerOver = false;
-            });
-
-            // keyboard: page-scroll worth of travel per keypress
-            marquee.addEventListener("keydown", function (e) {
-                if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
-                e.preventDefault();
-                var dir = e.key === "ArrowLeft" ? 1 : -1;
-                x = wrap(x + dir * marquee.clientWidth * 0.35);
-                throwVelocity = 0;
-                apply();
-            });
-
-            if (reduceMotion.matches) return;
-
-            marquee.addEventListener("pointerdown", function (e) {
-                if (e.pointerType === "mouse" && e.button !== 0) return;
-                isDragging = true;
-                pointerId = e.pointerId;
-                marquee.setPointerCapture(pointerId);
-                throwVelocity = 0;
-                offsetX = x - e.clientX;
-                lastX = e.clientX;
-                lastT = performance.now();
-                marquee.style.cursor = "grabbing";
-            });
-
-            marquee.addEventListener("pointermove", function (e) {
-                if (!isDragging || e.pointerId !== pointerId) return;
-                e.preventDefault();
-
-                var now = performance.now();
-                x = wrap(e.clientX + offsetX);
-
-                var dt = now - lastT;
-                if (dt > 0) {
-                    var dx = e.clientX - lastX;
-                    var sampled = (dx / dt) * 36.67;
-                    throwVelocity = clamp(
-                        -MAX_THROW,
-                        MAX_THROW,
-                        sampled * THROW_MULTIPLIER
-                    );
-                }
-                apply();
-                lastX = e.clientX;
-                lastT = now;
-            });
-
-            function endDrag(e) {
-                if (!isDragging || (e && e.pointerId !== pointerId)) return;
-                isDragging = false;
-                if (pointerId !== null && marquee.hasPointerCapture(pointerId)) {
-                    marquee.releasePointerCapture(pointerId);
-                }
-                pointerId = null;
-                marquee.style.cursor = "";
-            }
-
-            marquee.addEventListener("pointerup", endDrag);
-            marquee.addEventListener("pointercancel", endDrag);
-            marquee.addEventListener("pointerleave", endDrag);
         });
     });
 
