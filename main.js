@@ -875,6 +875,9 @@
                     dragging = index;
                     grab.x = pointer.x - glyphs[index].offset.x;
                     grab.y = pointer.y - glyphs[index].offset.y;
+                    // only for a mouse: on touch this would also cancel the
+                    // scroll gesture, and the hero has to stay swipeable
+                    if (e.pointerType === "mouse") e.preventDefault();
                     if (el.setPointerCapture) el.setPointerCapture(e.pointerId);
                 }
             }
@@ -897,7 +900,7 @@
 
         el.addEventListener("pointermove", onMove, { passive: true });
         el.addEventListener("pointerenter", onMove, { passive: true });
-        el.addEventListener("pointerdown", onDown, { passive: true });
+        el.addEventListener("pointerdown", onDown);
         el.addEventListener("pointerup", onUp, { passive: true });
         el.addEventListener("pointercancel", onUp, { passive: true });
         el.addEventListener("pointerleave", onLeave, { passive: true });

@@ -757,6 +757,13 @@ ol {
    display) is deliberate — it keeps the box the canvas is measured against. */
 .hero__title[data-tech-text] {
     position: relative;
+    /* the wordmark is a drag surface, so a drag across it must not start a
+       text selection: the browser highlight lands on top of the canvas and
+       paints a black slab behind the letters. Selection stays available to the
+       reader, which is what the canvas being aria-hidden is for. */
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
 }
 
 .tech-text__canvas {
