@@ -1242,7 +1242,12 @@
         if (!ctx) return;
 
         var MAX_DPR = 2;
-        var ORBIT_SQUASH = 0.6; // rings read as orbits, not flat circles
+        var ORBIT_SQUASH = 0.46; // edge-on, so the stack reads as one plane
+        var ORBIT_TILT = -0.35; // radians. Squashing alone still reads as a flat
+        // ring; rotating every ring about one shared axis is what makes the
+        // stack read as a disc seen at an angle.
+        var COS_T = Math.cos(ORBIT_TILT);
+        var SIN_T = Math.sin(ORBIT_TILT);
         var CORE_R = 2.6;
         var PUSH_R = 90; // how far the cursor can shove a body off its orbit
         var LINK_R = 150; // cursor tether reach
@@ -1280,21 +1285,21 @@
             ink = getComputedStyle(canvas).color.trim() || "#ff7a1a";
         }
 
-        /* Centres sit in the band above the headline: that is the only strip
-           that stays clear of hero copy at every viewport measured. The second
-           system takes a side margin. Both are fractions of the hero box, so
-           the pattern holds its shape at any size. */
+        /* One disc, not two. Two small systems read as noise on opposite
+           corners; one larger one reads as a single deliberate object. It sits
+           right of centre so the dense inner rings stay clear of the left half
+           of the wordmark, and the orbits cross the headline as a background
+           rather than fighting it. Fractions of the hero box, so the pattern
+           holds its shape at any size. */
         function layout() {
             var narrow = w / h < 1.1;
             var m = Math.min(w, h);
             systems = [];
 
             if (narrow) {
-                addSystem(0.5, 0.085, m * 0.185, 1);
-                addSystem(0.8, 0.4, m * 0.095, -1);
+                addSystem(0.5, 0.42, m * 0.44, 1);
             } else {
-                addSystem(0.5, 0.12, m * 0.22, 1);
-                addSystem(0.12, 0.64, m * 0.11, -1);
+                addSystem(0.62, 0.46, m * 0.4, 1);
             }
         }
 
@@ -1404,7 +1409,7 @@
                     ring = s.rings[j];
                     ctx.globalAlpha = 0.17 - j * 0.024;
                     ctx.beginPath();
-                    ctx.ellipse(s.cx, s.cy, ring.rx, ring.ry, 0, 0, Math.PI * 2);
+                    ctx.ellipse(s.cx, s.cy, ring.rx, ring.ry, ORBIT_TILT, 0, Math.PI * 2);
                     ctx.stroke();
                 }
             }
@@ -1430,8 +1435,13 @@
                         var rx = ring.rx * (1 + Math.sin(wob) * p.wx);
                         var ry = ring.ry * (1 + Math.cos(wob * 1.3) * p.wy);
 
-                        p.hx = s.cx + Math.cos(a) * rx;
-                        p.hy = s.cy + Math.sin(a) * ry;
+                        // the ring is drawn tilted, so the body has to be
+                        // placed through the same rotation or the dots drift
+                        // off their own path
+                        var bx = Math.cos(a) * rx;
+                        var by = Math.sin(a) * ry;
+                        p.hx = s.cx + bx * COS_T - by * SIN_T;
+                        p.hy = s.cy + bx * SIN_T + by * COS_T;
 
                         if (animated && pointer.active) {
                             dx = p.hx - pointer.x;
@@ -1461,8 +1471,10 @@
                 for (k = 0; k < s.core.length; k++) {
                     p = s.core[k];
                     a = p.a + s.spin * p.sp;
-                    p.hx = s.cx + Math.cos(a) * p.d;
-                    p.hy = s.cy + Math.sin(a) * p.d * ORBIT_SQUASH;
+                    var cbx = Math.cos(a) * p.d;
+                    var cby = Math.sin(a) * p.d * ORBIT_SQUASH;
+                    p.hx = s.cx + cbx * COS_T - cby * SIN_T;
+                    p.hy = s.cy + cbx * SIN_T + cby * COS_T;
 
                     if (animated && pointer.active) {
                         dx = p.hx - pointer.x;
