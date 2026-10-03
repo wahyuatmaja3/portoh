@@ -58,6 +58,7 @@
     --z-nav: 100;
     --z-spark: 9000;
     --z-overlay: 10000;
+    --z-cursor: 11000;
 
     color-scheme: dark;
 }
@@ -2153,6 +2154,104 @@ ol {
     }
 }
 
+/* ------------------------------------------------------------ target cursor -- */
+/* reactbits TargetCursor: four fixed-size L brackets that spin while idle and
+   snap out to the corners of whatever they are over. mix-blend-mode difference
+   inverts whatever they pass over, which is what keeps them readable on any
+   surface without theming. Only mounted for fine pointers, so touch keeps the
+   native cursor. */
+@media (hover: hover) and (pointer: fine) {
+    body.has-target-cursor,
+    body.has-target-cursor *,
+    body.has-target-cursor *::before,
+    body.has-target-cursor *::after {
+        cursor: none !important;
+    }
+}
+
+.target-cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: var(--z-cursor);
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    opacity: 0;
+    mix-blend-mode: difference;
+    transition: opacity var(--dur-fast) var(--ease-out);
+    will-change: transform;
+}
+
+.target-cursor.is-on {
+    opacity: 1;
+}
+
+/* The wrapper's transform is rewritten every frame, so the press scale lives
+   on this inner node where a plain CSS transition can own it. */
+.target-cursor__body {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    transform: scale(1);
+    transition: transform 0.2s var(--ease-out);
+}
+
+.target-cursor.is-down .target-cursor__body {
+    transform: scale(0.9);
+}
+
+/* The dot marks the exact pointer position. It stays visible while locked —
+   the brackets frame an element, this still says where the pointer is. */
+.target-cursor__dot {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 4px;
+    margin: -2px 0 0 -2px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.3s var(--ease-out);
+}
+
+.target-cursor.is-down .target-cursor__dot {
+    transform: scale(0.7);
+}
+
+/* An L: a 12px box with two of its borders removed, so each bracket is a pair
+   of 3px arms meeting at a corner. Size is constant — a bracket frames the
+   target, it never stretches to it. */
+.target-cursor__corner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 18px;
+    height: 18px;
+    box-sizing: border-box;
+    border: 3px solid #fff;
+    will-change: transform;
+}
+
+.target-cursor__corner--tl {
+    border-right: 0;
+    border-bottom: 0;
+}
+.target-cursor__corner--tr {
+    border-left: 0;
+    border-bottom: 0;
+}
+.target-cursor__corner--br {
+    border-left: 0;
+    border-top: 0;
+}
+.target-cursor__corner--bl {
+    border-right: 0;
+    border-top: 0;
+}
+
 /* ------------------------------------------------- motion & print prefs -- */
 @media (prefers-reduced-motion: reduce) {
     html {
@@ -2201,6 +2300,7 @@ ol {
     .cmd,
     .sheet,
     .flex-carousel,
+    .target-cursor,
     .carousel__controls {
         display: none !important;
     }
@@ -2208,7 +2308,7 @@ ol {
         background: #fff;
         color: #000;
     }
-    /* print has no pointer, so the wordmark can never be painted
+    /* print has no pointer, so the wordmark can never be painted — fall back
        to the real text underneath it rather than printing an empty box */
     .tech-text__canvas {
         display: none !important;

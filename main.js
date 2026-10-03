@@ -155,8 +155,80 @@
     });
 
     /* --------------------------------------------------------------------
-       FLIP TEXT — per-character 3D flip, sine-staggered delay
-       Ported from ObsidianUI flip-text
+       ROLE REEL — cycling job titles
+       ------------------------------------------------------------------ */
+    component("role-reel", function () {
+        var reel = document.querySelector("[data-reel]");
+        var track = reel && reel.querySelector("[data-reel-track]");
+        if (!reel || !track) return;
+
+        if (reduceMotion.matches) {
+            // no animation: show everything stacked, no overflow clipping
+            reel.style.height = "auto";
+            return;
+        }
+
+        var items = Array.prototype.slice.call(track.children);
+        var count = items.length;
+        if (count < 2) return;
+
+        // duplicate the first item so the loop is seamless: the clone sits at
+        // -count steps, which shows the same text as step 0 on the way back round
+        var clone = items[0].cloneNode(true);
+        track.appendChild(clone);
+
+        // the translate step must equal the line box of one item, otherwise the
+        // roll drifts out of sync and clips the titles. CSS owns that ratio in
+        // --reel-line so the clip window and the animation cannot disagree.
+        var step = parseFloat(getComputedStyle(reel).getPropertyValue("--reel-line"));
+        if (!step || isNaN(step)) step = 1.5;
+
+        var HOLD = 1.7; // seconds each title stays put
+        var total = HOLD * count;
+
+        // one stop per item, plus a final hold on the clone
+        var frames = [];
+        for (var i = 0; i <= count; i++) {
+            var translate = "transform:translateY(" + (-i * step).toFixed(4) + "em)";
+            if (i === count) {
+                // the last stop lands exactly on 100%, so a single selector is
+                // enough — emitting both would only duplicate the same value
+                frames.push("100%{" + translate + "}");
+            } else {
+                var startPct = (i / count) * 100;
+                var endPct = startPct + (100 / count) * 0.62;
+                frames.push(
+                    startPct.toFixed(2) + "%," + endPct.toFixed(2) + "%{" + translate + "}"
+                );
+            }
+        }
+
+        var style = document.createElement("style");
+        style.textContent = "@keyframes reel-roll{" + frames.join("") + "}";
+        document.head.appendChild(style);
+
+        // own the whole shorthand so the duration and the keyframes can never
+        // drift apart and leave a gap at the end of the loop
+        track.style.animation =
+            "reel-roll " +
+            total.toFixed(2) +
+            "s cubic-bezier(0.45,0,0.55,1) infinite";
+    });
+
+/* --------------------------------------------------------------------
+       TECH TEXT — pointer-reactive canvas wordmark for the hero name
+       Ported from reactbits TechText (canvas variant, no GSAP needed).
+
+       How it works: the name is not DOM text, it is painted on a canvas as
+       one small sprite per letter — a filled one and a "dashes" one (a dashed
+       stroke with the interior punched out via destination-out). Moving the
+       pointer swaps the letter under it from fill to outline, and a frame with
+       blinking specks rides along. Letters can be dragged off the baseline and
+       spring back; with the pointer away the reveal sweeps the word by itself.
+
+       Accessibility is not delegated to the canvas: the h1 keeps its real text
+       in the DOM (visually hidden but selectable and read by screen readers)
+       and the canvas is aria-hidden, so the name survives with no JS at all.
        ------------------------------------------------------------------ */
     component("tech-text", function () {
         var el = document.querySelector("[data-tech-text]");
@@ -868,67 +940,6 @@
     });
 
     /* --------------------------------------------------------------------
-       ROLE REEL — cycling job titles
-       ------------------------------------------------------------------ */
-    component("role-reel", function () {
-        var reel = document.querySelector("[data-reel]");
-        var track = reel && reel.querySelector("[data-reel-track]");
-        if (!reel || !track) return;
-
-        if (reduceMotion.matches) {
-            // no animation: show everything stacked, no overflow clipping
-            reel.style.height = "auto";
-            return;
-        }
-
-        var items = Array.prototype.slice.call(track.children);
-        var count = items.length;
-        if (count < 2) return;
-
-        // duplicate the first item so the loop is seamless: the clone sits at
-        // -count steps, which shows the same text as step 0 on the way back round
-        var clone = items[0].cloneNode(true);
-        track.appendChild(clone);
-
-        // the translate step must equal the line box of one item, otherwise the
-        // roll drifts out of sync and clips the titles. CSS owns that ratio in
-        // --reel-line so the clip window and the animation cannot disagree.
-        var step = parseFloat(getComputedStyle(reel).getPropertyValue("--reel-line"));
-        if (!step || isNaN(step)) step = 1.5;
-
-        var HOLD = 1.7; // seconds each title stays put
-        var total = HOLD * count;
-
-        // one stop per item, plus a final hold on the clone
-        var frames = [];
-        for (var i = 0; i <= count; i++) {
-            var translate = "transform:translateY(" + (-i * step).toFixed(4) + "em)";
-            if (i === count) {
-                // the last stop lands exactly on 100%, so a single selector is
-                // enough — emitting both would only duplicate the same value
-                frames.push("100%{" + translate + "}");
-            } else {
-                var startPct = (i / count) * 100;
-                var endPct = startPct + (100 / count) * 0.62;
-                frames.push(
-                    startPct.toFixed(2) + "%," + endPct.toFixed(2) + "%{" + translate + "}"
-                );
-            }
-        }
-
-        var style = document.createElement("style");
-        style.textContent = "@keyframes reel-roll{" + frames.join("") + "}";
-        document.head.appendChild(style);
-
-        // own the whole shorthand so the duration and the keyframes can never
-        // drift apart and leave a gap at the end of the loop
-        track.style.animation =
-            "reel-roll " +
-            total.toFixed(2) +
-            "s cubic-bezier(0.45,0,0.55,1) infinite";
-    });
-
-    /* --------------------------------------------------------------------
        PROGRESS TICKS — build the segmented level meters
        Ported from Bencho progress-ticks
        ------------------------------------------------------------------ */
@@ -1049,8 +1060,10 @@
     });
 
     /* --------------------------------------------------------------------
-       DRAGGABLE MARQUEE — auto-scroll + drag with inertia
-       Ported from ObsidianUI draggable-marquee (GSAP Draggable -> Pointer Events)
+       FLEX CAROUSEL — seamless continuous rail
+       Ported from reactbits FlexCarousel: a flex row that scrolls forever
+       because items are recycled to the tail the moment they clear the left
+       edge, instead of being cloned into a fixed-width track and wrapped.
        ------------------------------------------------------------------ */
     component("flex-carousel", function () {
         var roots = document.querySelectorAll("[data-flex-carousel]");
@@ -1565,7 +1578,6 @@
         }
     });
 
-
     /* --------------------------------------------------------------------
        CAROUSEL — snap scroller with drag, dots and buttons
        Ported from Bencho carousel
@@ -1619,7 +1631,7 @@
             slides.forEach(function (_, i) {
                 var dot = document.createElement("button");
                 dot.type = "button";
-                dot.className = "carousel__dot";
+                dot.className = "carousel__dot cursor-target";
                 dot.setAttribute("aria-label", "Go to step " + (i + 1));
                 dot.addEventListener("click", function () {
                     goTo(i, true);
@@ -2574,7 +2586,7 @@
                 }
 
                 var li = document.createElement("li");
-                li.className = "cmd__item";
+                li.className = "cmd__item cursor-target";
                 li.setAttribute("role", "option");
                 li.setAttribute("aria-selected", String(i === 0));
                 li.id = "cmd-item-" + i;
@@ -2725,10 +2737,15 @@
             target.setAttribute("tabindex", "-1");
             target.focus({ preventScroll: true });
 
-            if (history.replaceState) history.replaceState(null, "", hash);
+if (history.replaceState) history.replaceState(null, "", hash);
         });
     });
 
+    /* --------------------------------------------------------------------
+       GRADUAL BLUR — reactbits GradualBlur, ported to vanilla: layered
+       backdrop-filter bands that make content dissolve toward the bottom of
+       the viewport. Static band (no animation) so reduced motion is a no-op.
+       ------------------------------------------------------------------ */
     component("gradual-blur", function () {
         var band = document.createElement("div");
         band.className = "gradual-blur gradual-blur--page";
@@ -2765,5 +2782,249 @@
         window.setTimeout(function () {
             band.classList.add("is-on");
         }, 60);
+    });
+
+/* --------------------------------------------------------------------
+       TARGET CURSOR — reactbits TargetCursor, ported to vanilla
+       Four L-shaped corner brackets that spin slowly while idle. Hovering a
+       .cursor-target pauses the spin, resets it square, and sends each
+       bracket out to that element's corners; leaving pulls them back into a
+       tight cluster and the spin resumes.
+
+       The parallax is not extra maths: the wrapper itself trails the pointer
+       by ~0.08s, and the brackets are positioned relative to the wrapper, so
+       they lean as the wrapper catches up. That is the original trick and it
+       is why the effect reads as weight rather than as a lag.
+
+       Brackets are fixed 18px (a 12px box plus a 3px border) placed on the
+       target's corners — they never scale with the element, so a full-width
+       button gets the same four small marks as a small dot.
+
+       Only mounted for a fine pointer: touch keeps the native behaviour, and
+       the native cursor is hidden only once this component is confirmed up.
+       ------------------------------------------------------------------ */
+    component("target-cursor", function () {
+        if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+
+        var SELECTOR = root.getAttribute("data-cursor-targets") || ".cursor-target";
+        var SPIN_DURATION = 2; // seconds per idle revolution
+        var HOVER_DURATION = 0.2; // seconds for the brackets to reach the target
+        var PARALLAX_ON = true;
+        var FOLLOW = 0.08; // s, the wrapper's own lag behind the pointer
+        var BORDER = 3;
+        var CORNER = 18; // 12px box + 3px border, matching the original
+        var GAP = BORDER; // brackets stand off the target by their own border
+
+        var cursor = document.createElement("div");
+        cursor.className = "target-cursor";
+        cursor.setAttribute("aria-hidden", "true");
+
+        // the scale on click lives on an inner node so it can be a plain CSS
+        // transition while the wrapper's transform is rewritten every frame
+        var body = document.createElement("div");
+        body.className = "target-cursor__body";
+
+        var dot = document.createElement("div");
+        dot.className = "target-cursor__dot";
+
+        var corners = ["tl", "tr", "br", "bl"].map(function (position) {
+            var corner = document.createElement("div");
+            corner.className =
+                "target-cursor__corner target-cursor__corner--" + position;
+            body.appendChild(corner);
+            return corner;
+        });
+
+        body.appendChild(dot);
+        cursor.appendChild(body);
+        document.body.appendChild(cursor);
+
+        // where each bracket sits at rest: a small cluster off-centre from the
+        // pointer, exactly as the original lays it out
+        var IDLE = [
+            { x: -CORNER * 1, y: -CORNER * 1 },
+            { x: CORNER / 3, y: -CORNER * 1 },
+            { x: CORNER / 3, y: CORNER / 3 },
+            { x: -CORNER * 1, y: CORNER / 3 }
+        ];
+
+        var pos = IDLE.map(function (p) {
+            return { x: p.x, y: p.y };
+        });
+
+        var raf = 0;
+        var last = 0;
+        var rotation = 0;
+        var spinHold = 0; // timestamp before which the spin stays parked
+        var seen = false;
+        var strength = 0;
+        var target = null;
+        var pointerX = 0;
+        var pointerY = 0;
+        var curX = 0;
+        var curY = 0;
+        var placed = false;
+
+        function approach(current, goal, dt, seconds) {
+            var k = 1 - Math.exp(-dt / Math.max(0.0005, seconds));
+            return current + (goal - current) * k;
+        }
+
+        /* The four bracket origins for the current target, in viewport space.
+           tl/bl hang off the element's left edge, tr/br off its right, and
+           every bracket stands off by GAP so it frames rather than overlaps. */
+        function bracketsFor(rect) {
+            var right = rect.right + GAP - CORNER;
+            var bottom = rect.bottom + GAP - CORNER;
+            var top = rect.top - GAP;
+            var left = rect.left - GAP;
+            return [
+                { x: left, y: top },
+                { x: right, y: top },
+                { x: right, y: bottom },
+                { x: left, y: bottom }
+            ];
+        }
+
+        function release() {
+            target = null;
+            strength = 0;
+            spinHold = performance.now() + 50;
+        }
+
+        /* Resolve the target from the pointer position instead of trusting
+           enter/leave events. Magnetic buttons translate themselves toward the
+           pointer, sheets slide, the carousel advances — every one of those
+           moves an element out from under a cursor that never moved, and an
+           event-driven target goes stale and quietly drops the lock. One
+           hit test per frame is cheaper than getting that wrong. */
+        function resolve() {
+            if (!seen) return;
+            var hit = document.elementFromPoint(pointerX, pointerY);
+            var found = hit instanceof Element ? hit.closest(SELECTOR) : null;
+            if (found === target) return;
+            if (found) {
+                target = found;
+            } else {
+                release();
+            }
+        }
+
+        function frame(now) {
+            raf = requestAnimationFrame(frame);
+            var dt = Math.min(0.05, Math.max(0.001, (now - last) / 1000));
+            last = now;
+
+            if (!seen) {
+                cursor.style.opacity = "0";
+                return;
+            }
+            cursor.style.opacity = "";
+
+            resolve();
+
+            // the wrapper trails the pointer; the brackets inherit that lag,
+            // which is the whole of the parallax effect
+            if (!placed) {
+                curX = pointerX;
+                curY = pointerY;
+                placed = true;
+            }
+            curX = approach(curX, pointerX, dt, FOLLOW);
+            curY = approach(curY, pointerY, dt, FOLLOW);
+
+            var goals = IDLE;
+            if (target) {
+                var rect = target.getBoundingClientRect();
+                if (rect.width && rect.height) {
+                    strength = Math.min(1, strength + dt / HOVER_DURATION);
+                    goals = bracketsFor(rect);
+                    // square up the moment it locks, then hold the spin while
+                    // it is parked so the frame stays readable
+                    rotation = 0;
+                } else {
+                    release();
+                }
+            }
+
+            if (!target && !reduceMotion.matches && now >= spinHold) {
+                rotation += (360 / SPIN_DURATION) * dt;
+            }
+
+            // Brackets reach out fast while the lock is forming, then drop to a
+            // gentler follow once parked — that gentler follow is what reads as
+            // parallax. Without it they would be nailed to the corners.
+            // These are exponential time constants, not tween durations: a 0.2s
+            // tween is done at 0.2s, where tau 0.2 would still be 63% out.
+            var settle = !target
+                ? 0.1
+                : strength >= 0.99
+                  ? PARALLAX_ON
+                      ? 0.12
+                      : 0.001
+                  : 0.05;
+
+            cursor.style.transform =
+                "translate3d(" +
+                curX.toFixed(2) +
+                "px," +
+                curY.toFixed(2) +
+                "px,0) rotate(" +
+                rotation.toFixed(2) +
+                "deg)";
+
+            for (var i = 0; i < 4; i++) {
+                // goals are absolute; the brackets are positioned relative to
+                // the wrapper, so subtracting the wrapper is what lets a single
+                // transform carry both the lock and the lean
+                var gx = target ? goals[i].x - curX : IDLE[i].x;
+                var gy = target ? goals[i].y - curY : IDLE[i].y;
+                pos[i].x = approach(pos[i].x, gx, dt, settle);
+                pos[i].y = approach(pos[i].y, gy, dt, settle);
+                corners[i].style.transform =
+                    "translate3d(" +
+                    pos[i].x.toFixed(2) +
+                    "px," +
+                    pos[i].y.toFixed(2) +
+                    "px,0)";
+            }
+        }
+
+        function onMove(e) {
+            if (e.pointerType !== "mouse") return;
+            pointerX = e.clientX;
+            pointerY = e.clientY;
+            if (!seen) {
+                seen = true;
+                cursor.classList.add("is-on");
+            }
+        }
+
+        function onExit() {
+            seen = false;
+            placed = false;
+            release();
+            cursor.classList.remove("is-on", "is-down");
+        }
+
+        document.addEventListener("pointermove", onMove, { passive: true });
+        document.addEventListener("pointerdown", function (e) {
+            if (e.pointerType !== "mouse") return;
+            cursor.classList.add("is-down");
+        });
+        document.addEventListener("pointerup", function () {
+            cursor.classList.remove("is-down");
+        });
+        document.addEventListener("pointerout", function (e) {
+            // relatedTarget is only null when the pointer leaves the window
+            if (e.relatedTarget) return;
+            onExit();
+        });
+        window.addEventListener("blur", onExit);
+
+        // hide the native cursor only once this component is confirmed alive
+        document.body.classList.add("has-target-cursor");
+        last = performance.now();
+        raf = requestAnimationFrame(frame);
     });
 }());

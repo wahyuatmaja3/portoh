@@ -38,7 +38,7 @@
     </head>
 
     <body>
-        <a class="skip-link" href="#main">Skip to content</a>
+        <a class="skip-link cursor-target" href="#main">Skip to content</a>
 
         <!-- Shared SVG filters: gooey merge for blobs + toggle, noise for grain -->
         <svg class="svg-defs" aria-hidden="true" focusable="false">
@@ -83,20 +83,20 @@
         <!-- ======= NAVBAR ======= -->
         <header class="nav" id="nav">
             <div class="nav__inner">
-                <a class="nav__logo" href="#hero" data-magnetic>
+                <a class="nav__logo cursor-target" href="#hero" data-magnetic>
                     <span class="nav__logo-mark">WTA<span class="accent">.</span></span>
                 </a>
 
                 <nav class="nav__links" aria-label="Sections">
-                    <a href="#about" data-nav-link><span>01</span> About</a>
-                    <a href="#skills" data-nav-link><span>02</span> Skills</a>
-                    <a href="#projects" data-nav-link><span>03</span> Work</a>
-                    <a href="#process" data-nav-link><span>04</span> Process</a>
-                    <a href="#contact" data-nav-link><span>05</span> Contact</a>
+                    <a class="cursor-target" href="#about" data-nav-link><span>01</span> About</a>
+                    <a class="cursor-target" href="#skills" data-nav-link><span>02</span> Skills</a>
+                    <a class="cursor-target" href="#projects" data-nav-link><span>03</span> Work</a>
+                    <a class="cursor-target" href="#process" data-nav-link><span>04</span> Process</a>
+                    <a class="cursor-target" href="#contact" data-nav-link><span>05</span> Contact</a>
                 </nav>
 
                 <div class="nav__actions">
-                    <button class="cmd-trigger" id="cmdTrigger" type="button" aria-label="Open command menu">
+                    <button class="cmd-trigger cursor-target" id="cmdTrigger" type="button" aria-label="Open command menu">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                             <circle cx="11" cy="11" r="7" />
                             <path d="M20 20l-3.5-3.5" stroke-linecap="round" />
@@ -107,7 +107,7 @@
 
                     <!-- Liquid theme toggle (Bencho liquid-toggle, gooey merge) -->
                     <button
-                        class="theme-toggle"
+                        class="theme-toggle cursor-target"
                         id="themeToggle"
                         type="button"
                         role="switch"
@@ -165,13 +165,13 @@
                     </p>
 
                     <div class="hero__actions" data-reveal>
-                        <a class="btn btn--primary magnetic" href="#projects" data-magnetic>
+                        <a class="btn btn--primary magnetic cursor-target" href="#projects" data-magnetic>
                             View selected work
                             <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                                 <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
                         </a>
-                        <a class="btn btn--ghost magnetic" href="https://github.com/wahyuatmaja3" target="_blank" rel="noopener noreferrer" data-magnetic>
+                        <a class="btn btn--ghost magnetic cursor-target" href="https://github.com/wahyuatmaja3" target="_blank" rel="noopener noreferrer" data-magnetic>
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                                 <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z" />
                             </svg>
@@ -195,7 +195,7 @@
                     </dl>
                 </div>
 
-                <a class="hero__scroll" href="#about" aria-label="Scroll to About">
+                <a class="hero__scroll cursor-target" href="#about" aria-label="Scroll to About">
                     <span class="hero__scroll-line" aria-hidden="true"></span>
                     Scroll
                 </a>
@@ -277,18 +277,18 @@
                 <!-- Continuous skill rail (reactbits FlexCarousel) -->
                 <div class="flex-carousel" data-flex-carousel tabindex="0" role="region" aria-label="Skills I reach for. Hover to pause, or focus and use the left and right arrow keys.">
                     <div class="flex-carousel__track" data-flex-carousel-track>
-                        <span class="skill" data-skill data-level="92"><span class="skill__name">Flutter</span><span class="skill__level">92</span><span class="ticks" data-ticks="5" data-filled="5" aria-hidden="true"></span></span>
-                        <span class="skill" data-skill data-level="90"><span class="skill__name">Dart</span><span class="skill__level">90</span><span class="ticks" data-ticks="5" data-filled="4" aria-hidden="true"></span></span>
-                        <span class="skill" data-skill data-level="90"><span class="skill__name">VS Code</span><span class="skill__level">90</span><span class="ticks" data-ticks="5" data-filled="4" aria-hidden="true"></span></span>
-                        <span class="skill" data-skill data-level="88"><span class="skill__name">Android Studio</span><span class="skill__level">88</span><span class="ticks" data-ticks="5" data-filled="4" aria-hidden="true"></span></span>
-                        <span class="skill" data-skill data-level="85"><span class="skill__name">Git</span><span class="skill__level">85</span><span class="ticks" data-ticks="5" data-filled="4" aria-hidden="true"></span></span>
-                        <span class="skill" data-skill data-level="75"><span class="skill__name">Java</span><span class="skill__level">75</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
-                        <span class="skill" data-skill data-level="70"><span class="skill__name">Pascal</span><span class="skill__level">70</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
-                        <span class="skill" data-skill data-level="70"><span class="skill__name">Delphi 5</span><span class="skill__level">70</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
-                        <span class="skill" data-skill data-level="65"><span class="skill__name">Python</span><span class="skill__level">65</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
-                        <span class="skill" data-skill data-level="55"><span class="skill__name">Go</span><span class="skill__level">55</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
-                        <span class="skill" data-skill data-level="70"><span class="skill__name">Laravel</span><span class="skill__level">70</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
-                        <span class="skill" data-skill data-level="65"><span class="skill__name">PHP</span><span class="skill__level">65</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
+                        <span class="skill cursor-target" data-skill data-level="92"><span class="skill__name">Flutter</span><span class="skill__level">92</span><span class="ticks" data-ticks="5" data-filled="5" aria-hidden="true"></span></span>
+                        <span class="skill cursor-target" data-skill data-level="90"><span class="skill__name">Dart</span><span class="skill__level">90</span><span class="ticks" data-ticks="5" data-filled="4" aria-hidden="true"></span></span>
+                        <span class="skill cursor-target" data-skill data-level="90"><span class="skill__name">VS Code</span><span class="skill__level">90</span><span class="ticks" data-ticks="5" data-filled="4" aria-hidden="true"></span></span>
+                        <span class="skill cursor-target" data-skill data-level="88"><span class="skill__name">Android Studio</span><span class="skill__level">88</span><span class="ticks" data-ticks="5" data-filled="4" aria-hidden="true"></span></span>
+                        <span class="skill cursor-target" data-skill data-level="85"><span class="skill__name">Git</span><span class="skill__level">85</span><span class="ticks" data-ticks="5" data-filled="4" aria-hidden="true"></span></span>
+                        <span class="skill cursor-target" data-skill data-level="75"><span class="skill__name">Java</span><span class="skill__level">75</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
+                        <span class="skill cursor-target" data-skill data-level="70"><span class="skill__name">Pascal</span><span class="skill__level">70</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
+                        <span class="skill cursor-target" data-skill data-level="70"><span class="skill__name">Delphi 5</span><span class="skill__level">70</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
+                        <span class="skill cursor-target" data-skill data-level="65"><span class="skill__name">Python</span><span class="skill__level">65</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
+                        <span class="skill cursor-target" data-skill data-level="55"><span class="skill__name">Go</span><span class="skill__level">55</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
+                        <span class="skill cursor-target" data-skill data-level="70"><span class="skill__name">Laravel</span><span class="skill__level">70</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
+                        <span class="skill cursor-target" data-skill data-level="65"><span class="skill__name">PHP</span><span class="skill__level">65</span><span class="ticks" data-ticks="5" data-filled="3" aria-hidden="true"></span></span>
                     </div>
                 </div>
 
@@ -344,10 +344,10 @@
                                     </ul>
                                 </div>
                                 <div class="pcard__actions">
-                                    <button class="pcard__cta" type="button" data-case-study="artha">
+                                    <button class="pcard__cta cursor-target" type="button" data-case-study="artha">
                                         Read case study
                                     </button>
-                                    <a class="pcard__icon-link" href="https://github.com/wahyuatmaja3/artha" target="_blank" rel="noopener noreferrer" aria-label="artha on GitHub">
+                                    <a class="pcard__icon-link cursor-target" href="https://github.com/wahyuatmaja3/artha" target="_blank" rel="noopener noreferrer" aria-label="artha on GitHub">
                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                                             <path d="M7 17L17 7M7 7h10v10" stroke-linecap="round" stroke-linejoin="round" />
                                         </svg>
@@ -373,10 +373,10 @@
                                     </ul>
                                 </div>
                                 <div class="pcard__actions">
-                                    <button class="pcard__cta" type="button" data-case-study="pendaftaran-siswa-smktag">
+                                    <button class="pcard__cta cursor-target" type="button" data-case-study="pendaftaran-siswa-smktag">
                                         Read case study
                                     </button>
-                                    <a class="pcard__icon-link" href="https://github.com/wahyuatmaja3/pendaftaran-siswa-smktag" target="_blank" rel="noopener noreferrer" aria-label="pendaftaran-siswa-smktag on GitHub">
+                                    <a class="pcard__icon-link cursor-target" href="https://github.com/wahyuatmaja3/pendaftaran-siswa-smktag" target="_blank" rel="noopener noreferrer" aria-label="pendaftaran-siswa-smktag on GitHub">
                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                                             <path d="M7 17L17 7M7 7h10v10" stroke-linecap="round" stroke-linejoin="round" />
                                         </svg>
@@ -402,10 +402,10 @@
                                     </ul>
                                 </div>
                                 <div class="pcard__actions">
-                                    <button class="pcard__cta" type="button" data-case-study="kyros">
+                                    <button class="pcard__cta cursor-target" type="button" data-case-study="kyros">
                                         Read case study
                                     </button>
-                                    <a class="pcard__icon-link" href="https://github.com/wahyuatmaja3/kyros" target="_blank" rel="noopener noreferrer" aria-label="kyros on GitHub">
+                                    <a class="pcard__icon-link cursor-target" href="https://github.com/wahyuatmaja3/kyros" target="_blank" rel="noopener noreferrer" aria-label="kyros on GitHub">
                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                                             <path d="M7 17L17 7M7 7h10v10" stroke-linecap="round" stroke-linejoin="round" />
                                         </svg>
@@ -431,10 +431,10 @@
                                     </ul>
                                 </div>
                                 <div class="pcard__actions">
-                                    <button class="pcard__cta" type="button" data-case-study="figureiie">
+                                    <button class="pcard__cta cursor-target" type="button" data-case-study="figureiie">
                                         Read case study
                                     </button>
-                                    <a class="pcard__icon-link" href="https://github.com/wahyuatmaja3/figureiie" target="_blank" rel="noopener noreferrer" aria-label="figureiie on GitHub">
+                                    <a class="pcard__icon-link cursor-target" href="https://github.com/wahyuatmaja3/figureiie" target="_blank" rel="noopener noreferrer" aria-label="figureiie on GitHub">
                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                                             <path d="M7 17L17 7M7 7h10v10" stroke-linecap="round" stroke-linejoin="round" />
                                         </svg>
@@ -460,10 +460,10 @@
                                     </ul>
                                 </div>
                                 <div class="pcard__actions">
-                                    <button class="pcard__cta" type="button" data-case-study="deiji-marketplace">
+                                    <button class="pcard__cta cursor-target" type="button" data-case-study="deiji-marketplace">
                                         Read case study
                                     </button>
-                                    <a class="pcard__icon-link" href="https://github.com/wahyuatmaja3/deiji-marketplace" target="_blank" rel="noopener noreferrer" aria-label="deiji-marketplace on GitHub">
+                                    <a class="pcard__icon-link cursor-target" href="https://github.com/wahyuatmaja3/deiji-marketplace" target="_blank" rel="noopener noreferrer" aria-label="deiji-marketplace on GitHub">
                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                                             <path d="M7 17L17 7M7 7h10v10" stroke-linecap="round" stroke-linejoin="round" />
                                         </svg>
@@ -487,10 +487,10 @@
                                     </ul>
                                 </div>
                                 <div class="pcard__actions">
-                                    <button class="pcard__cta" type="button" data-case-study="yakusoku">
+                                    <button class="pcard__cta cursor-target" type="button" data-case-study="yakusoku">
                                         Read case study
                                     </button>
-                                    <a class="pcard__icon-link" href="https://github.com/wahyuatmaja3/yakusoku" target="_blank" rel="noopener noreferrer" aria-label="yakusoku on GitHub">
+                                    <a class="pcard__icon-link cursor-target" href="https://github.com/wahyuatmaja3/yakusoku" target="_blank" rel="noopener noreferrer" aria-label="yakusoku on GitHub">
                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                                             <path d="M7 17L17 7M7 7h10v10" stroke-linecap="round" stroke-linejoin="round" />
                                         </svg>
@@ -501,7 +501,7 @@
                     </ul>
 
                     <div class="projects__more" data-reveal>
-                        <a class="btn btn--outline" href="https://github.com/wahyuatmaja3?tab=repositories" target="_blank" rel="noopener noreferrer" data-magnetic>
+                        <a class="btn btn--outline cursor-target" href="https://github.com/wahyuatmaja3?tab=repositories" target="_blank" rel="noopener noreferrer" data-magnetic>
                             View all 19 repositories
                             <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                                 <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
@@ -528,7 +528,7 @@
                     <div class="carousel" data-carousel data-reveal>
                         <div class="carousel__viewport" data-carousel-viewport>
                             <ul class="carousel__track" data-carousel-track aria-label="Working process, five steps">
-                                <li class="carousel__slide">
+                                <li class="carousel__slide cursor-target">
                                     <p class="carousel__step">01</p>
                                     <h3 class="carousel__title">Read the room</h3>
                                     <p class="carousel__body">
@@ -537,7 +537,7 @@
                                         for the person on the other side of the screen.
                                     </p>
                                 </li>
-                                <li class="carousel__slide">
+                                <li class="carousel__slide cursor-target">
                                     <p class="carousel__step">02</p>
                                     <h3 class="carousel__title">Cut the scope</h3>
                                     <p class="carousel__body">
@@ -546,7 +546,7 @@
                                         parked, not quietly buried in the backlog.
                                     </p>
                                 </li>
-                                <li class="carousel__slide">
+                                <li class="carousel__slide cursor-target">
                                     <p class="carousel__step">03</p>
                                     <h3 class="carousel__title">Build in the open</h3>
                                     <p class="carousel__body">
@@ -555,7 +555,7 @@
                                         cheaper to find on a working build.
                                     </p>
                                 </li>
-                                <li class="carousel__slide">
+                                <li class="carousel__slide cursor-target">
                                     <p class="carousel__step">04</p>
                                     <h3 class="carousel__title">Measure, then trim</h3>
                                     <p class="carousel__body">
@@ -564,7 +564,7 @@
                                         shorter, and both read better.
                                     </p>
                                 </li>
-                                <li class="carousel__slide">
+                                <li class="carousel__slide cursor-target">
                                     <p class="carousel__step">05</p>
                                     <h3 class="carousel__title">Keep it standing</h3>
                                     <p class="carousel__body">
@@ -578,7 +578,7 @@
 
                         <div class="carousel__controls">
                             <button
-                                class="carousel__btn magnetic"
+                                class="carousel__btn magnetic cursor-target"
                                 type="button"
                                 data-carousel-prev
                                 data-magnetic
@@ -592,7 +592,7 @@
                             <div class="carousel__dots" data-carousel-dots></div>
 
                             <button
-                                class="carousel__btn magnetic"
+                                class="carousel__btn magnetic cursor-target"
                                 type="button"
                                 data-carousel-next
                                 data-magnetic
@@ -624,7 +624,7 @@
                     <!-- Slide to confirm (Bencho slide-to-confirm) -->
                     <div class="slide" data-reveal>
                         <div
-                            class="slide__track"
+                            class="slide__track cursor-target"
                             id="slideTrack"
                             role="slider"
                             tabindex="0"
@@ -644,33 +644,27 @@
                         </div>
                         <p class="slide__fallback">
                             Or just email me directly at
-                            <a href="mailto:wahyusou@gmail.com" data-copy-email="wahyusou@gmail.com">wahyusou@gmail.com</a>
+                            <a class="cursor-target" href="mailto:wahyusou@gmail.com" data-copy-email="wahyusou@gmail.com">wahyusou@gmail.com</a>
                         </p>
-                    </div>
-
-                    <!-- Draggable glass bubble (Bencho glass-bubble) -->
-                    <div class="bubble" data-bubble aria-hidden="true">
-                        <span class="bubble__orb"></span>
-                        <span class="bubble__sheen"></span>
                     </div>
 
                     <ul class="channels" data-reveal>
                         <li>
-                            <a class="channel magnetic" href="mailto:wahyusou@gmail.com" data-magnetic data-copy-email="wahyusou@gmail.com">
+                            <a class="channel magnetic cursor-target" href="mailto:wahyusou@gmail.com" data-magnetic data-copy-email="wahyusou@gmail.com">
                                 <span class="channel__label">Email</span>
                                 <span class="channel__value" data-copy-label>wahyusou@gmail.com</span>
                                 <span class="channel__hint" data-copy-hint>Copy</span>
                             </a>
                         </li>
                         <li>
-                            <a class="channel magnetic" href="https://github.com/wahyuatmaja3" target="_blank" rel="noopener noreferrer" data-magnetic>
+                            <a class="channel magnetic cursor-target" href="https://github.com/wahyuatmaja3" target="_blank" rel="noopener noreferrer" data-magnetic>
                                 <span class="channel__label">GitHub</span>
                                 <span class="channel__value">wahyuatmaja3</span>
                                 <span class="channel__hint">19 repos</span>
                             </a>
                         </li>
                         <li>
-                            <a class="channel magnetic" href="https://id.linkedin.com/in/wahyu-tri-atmaja-642207376" target="_blank" rel="noopener noreferrer" data-magnetic>
+                            <a class="channel magnetic cursor-target" href="https://id.linkedin.com/in/wahyu-tri-atmaja-642207376" target="_blank" rel="noopener noreferrer" data-magnetic>
                                 <span class="channel__label">LinkedIn</span>
                                 <span class="channel__value">Wahyu Tri Atmaja</span>
                                 <span class="channel__hint">Connect</span>
@@ -710,7 +704,7 @@
                         <span id="visitCount">—</span>
                         <span id="visitNoun">visits</span>
                     </p>
-                    <a class="btn btn--sm btn--outline" href="#hero" data-magnetic>Back to top ↑</a>
+                    <a class="btn btn--sm btn--outline cursor-target" href="#hero" data-magnetic>Back to top ↑</a>
                 </div>
             </div>
         </footer>
@@ -727,7 +721,7 @@
                     <input
                         type="text"
                         id="cmdInput"
-                        class="cmd__input"
+                        class="cmd__input cursor-target"
                         placeholder="Jump to a section, or run an action…"
                         autocomplete="off"
                         spellcheck="false"
@@ -763,7 +757,7 @@
                         <p class="sheet__kicker">Case study</p>
                         <h3 class="sheet__title" id="sheetTitle"></h3>
                     </div>
-                    <button class="sheet__close" id="sheetClose" type="button" aria-label="Close case study">
+                    <button class="sheet__close cursor-target" id="sheetClose" type="button" aria-label="Close case study">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                             <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round" />
                         </svg>
@@ -794,8 +788,8 @@
                 </section>
 
                 <footer class="sheet__actions">
-                    <a class="btn btn--ghost" id="sheetRepo" href="#" target="_blank" rel="noopener noreferrer">View repository</a>
-                    <a class="btn btn--primary" id="sheetGitHub" href="#" target="_blank" rel="noopener noreferrer">Open on GitHub</a>
+                    <a class="btn btn--ghost cursor-target" id="sheetRepo" href="#" target="_blank" rel="noopener noreferrer">View repository</a>
+                    <a class="btn btn--primary cursor-target" id="sheetGitHub" href="#" target="_blank" rel="noopener noreferrer">Open on GitHub</a>
                 </footer>
             </div>
         </div>
