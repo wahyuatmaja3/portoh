@@ -1,0 +1,17 @@
+# Third-party runtime deps fetched locally (referenced by index.html,
+# provided via CDN in deploys)
+vendor/
+
+# Debug screenshots from manual QA
+shot-*.png
+
+# Local backup of the pre-redesign layout
+.bak-v1/
+
+# Claude Code worktrees (gitlinks, not source)
+.claude/worktrees/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
