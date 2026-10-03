@@ -79,7 +79,9 @@
     --accent: #ff7a1a;
     --accent-ink: #1a0d02;
     --accent-soft: rgba(255, 122, 26, 0.14);
-    --accent-line: rgba(255, 122, 26, 0.34);
+    /* the particle canvas is painted in this ink, carried by the theme; the
+       canvas reads its own computed color, so nothing in JS knows the name */
+    --particle-ink: #ff7a1a;
 
     --toggle-track: #232329;
     --shadow-lg: 0 24px 60px -20px rgba(0, 0, 0, 0.8);
@@ -120,7 +122,7 @@
     --accent: #c2410c;
     --accent-ink: #ffffff;
     --accent-soft: rgba(194, 65, 12, 0.1);
-    --accent-line: rgba(194, 65, 12, 0.3);
+    --particle-ink: #c2410c;
 
     --toggle-track: #d9d5cb;
     --shadow-lg: 0 24px 60px -24px rgba(70, 30, 10, 0.22);
@@ -640,7 +642,11 @@ ol {
     isolation: isolate;
 }
 
-/* particle field sits behind the hero copy, never over it */
+/* particle field sits behind the hero copy, never over it.
+   The ink is set as `color` and the canvas paints itself in it, so the theme
+   carries the particle palette through ordinary cascade. The stroke weights
+   below reuse the same ink at lower alpha, which is why there is no separate
+   line token. */
 .hero__particles {
     position: absolute;
     inset: 0;
@@ -648,6 +654,7 @@ ol {
     width: 100%;
     height: 100%;
     display: block;
+    color: var(--particle-ink, var(--accent));
     pointer-events: none;
     opacity: 0.85;
 }
@@ -656,59 +663,37 @@ ol {
     width: 100%;
 }
 
-/* ------------------------------------------------------------ glass bubble */
-/* parked in the empty right half of the contact section, level with the
-   slide-to-confirm so the two drag interactions read as a pair */
-.bubble {
-    position: absolute;
-    z-index: 1;
-    top: var(--bubble-top, 0px);
-    left: var(--bubble-left, 0px);
-    width: clamp(4.5rem, 10vw, 8.5rem);
-    aspect-ratio: 1;
-    touch-action: none;
-    cursor: grab;
-    will-change: transform;
+/* --------------------------------------------------------- gradual blur ---
+   reactbits GradualBlur ported to vanilla: stacked backdrop-filter layers,
+   each masked to its own band by JS, so content passing under the bottom edge
+   of the viewport dissolves instead of cutting off. `--z-nav` is 100; the band
+   sits under it so the nav never gets frosted. */
+.gradual-blur {
+    isolation: isolate;
+    pointer-events: none;
 }
-
-.bubble.is-dragging {
-    cursor: grabbing;
+.gradual-blur--page {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 7rem;
+    z-index: calc(var(--z-nav) - 10);
+    opacity: 0;
+    transition: opacity 0.5s ease;
 }
-
-.bubble__orb {
+.gradual-blur--page.is-on {
+    opacity: 1;
+}
+.gradual-blur__layer {
     position: absolute;
     inset: 0;
-    border-radius: 50%;
-    background: radial-gradient(
-            circle at 32% 28%,
-            color-mix(in srgb, var(--accent) 40%, transparent),
-            transparent 58%
-        ),
-        color-mix(in srgb, var(--bg) 55%, transparent);
-    box-shadow:
-        inset 0 1px 1px color-mix(in srgb, #fff 55%, transparent),
-        inset 0 -1px 2px color-mix(in srgb, var(--accent) 30%, transparent),
-        0 18px 40px -18px color-mix(in srgb, var(--accent) 45%, transparent);
-    -webkit-backdrop-filter: blur(10px) saturate(1.4);
-    backdrop-filter: blur(10px) saturate(1.4);
-    border: 1px solid color-mix(in srgb, #fff 18%, transparent);
 }
-
-/* the specular highlight that sells it as glass rather than a flat circle */
-.bubble__sheen {
-    position: absolute;
-    top: 16%;
-    left: 22%;
-    width: 42%;
-    height: 26%;
-    border-radius: 50%;
-    background: linear-gradient(
-        160deg,
-        color-mix(in srgb, #fff 62%, transparent),
-        transparent 70%
-    );
-    filter: blur(2px);
-    pointer-events: none;
+@supports not (backdrop-filter: blur(1px)) {
+    .gradual-blur__layer {
+        background: rgba(0, 0, 0, 0.3);
+        opacity: 0.5;
+    }
 }
 
 .availability {
@@ -764,33 +749,29 @@ ol {
     perspective: 1000px;
 }
 
-.hero__title .word {
-    display: inline-block;
-    white-space: nowrap;
-    transform-style: preserve-3d;
-}
-
-/* flip-text: per-character 3D flip, sine-staggered via --flip-delay */
-.flip-char {
-    display: inline-block;
+/* tech-text: the name is painted on a canvas layered over this heading. The
+   text stays in the DOM for screen readers and for the no-JS fallback, but is
+   hidden once the canvas is live, so the two never double up. visibility (not
+   display) is deliberate — it keeps the box the canvas is measured against. */
+.hero__title[data-tech-text] {
     position: relative;
-    transform-style: preserve-3d;
-    animation: char-flip 900ms var(--ease-out) both;
-    animation-delay: var(--flip-delay, 0s);
 }
 
-@keyframes char-flip {
-    0% {
-        transform: rotateX(-92deg) translateZ(-40px);
-        opacity: 0;
-    }
-    60% {
-        opacity: 1;
-    }
-    100% {
-        transform: rotateX(0deg) translateZ(0);
-        opacity: 1;
-    }
+.tech-text__canvas {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    /* the wordmark is the hit area for drag; it must not eat the links under it */
+    pointer-events: none;
+}
+
+.hero__title[data-tech-text].is-canvas {
+    /* the canvas owns the painting; the real text stays in the accessibility
+       tree, it just stops being ink. The box itself is untouched, which is
+       what keeps the hero measuring exactly as it did before. */
+    color: transparent;
 }
 
 .hero__roles {
@@ -2216,10 +2197,7 @@ ol {
     .hero__particles {
         display: none;
     }
-    /* the bubble stays: dragging it is user-initiated, and a static glass
-       orb carries no motion of its own. Only the easing and the springy
-       release are dropped, so the orb just tracks the pointer. */
-    .bubble {
+    .gradual-blur--page {
         transition: none;
     }
 }
@@ -2229,7 +2207,7 @@ ol {
     .preloader,
     .click-spark,
     .hero__particles,
-    .bubble,
+    .gradual-blur--page,
     .hero__scroll,
     .cmd,
     .sheet,

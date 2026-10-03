@@ -606,15 +606,17 @@
         var visible = true;
         var pointer = { x: 0, y: 0, active: false };
 
-        // resolved on theme change, not per frame — getComputedStyle on every
-        // frame is a forced style recalc and costs more than the drawing does
-        var dot = "#ff7a1a";
-        var line = "rgba(255, 122, 26, 0.34)";
+        // The ink comes from the canvas' own computed `color`, which the theme
+        // sets through ordinary cascade. Nothing here knows a token name, so a
+        // theme can recolour the field without touching this file, and there is
+        // no hardcoded palette to fall out of sync.
+        //
+        // Re-read only when the theme attribute flips: getComputedStyle on every
+        // frame is a forced style recalc and costs more than the drawing does.
+        var ink = "#ff7a1a";
 
         function readTheme() {
-            var cs = getComputedStyle(root);
-            dot = cs.getPropertyValue("--accent").trim() || "#ff7a1a";
-            line = cs.getPropertyValue("--accent-line").trim() || "rgba(255, 122, 26, 0.34)";
+            ink = getComputedStyle(canvas).color.trim() || "#ff7a1a";
         }
 
         /* Centres sit in the band above the headline: that is the only strip
@@ -731,8 +733,9 @@
                 }
             }
 
-            // the orbit paths, so the pattern still reads where no body sits
-            ctx.strokeStyle = line;
+            // the orbit paths, so the pattern still reads where no body sits.
+            // Same ink as the bodies, carried down by globalAlpha.
+            ctx.strokeStyle = ink;
             ctx.lineWidth = 1;
             for (i = 0; i < systems.length; i++) {
                 s = systems[i];
@@ -746,7 +749,7 @@
             }
             ctx.globalAlpha = 1;
 
-            ctx.fillStyle = dot;
+            ctx.fillStyle = ink;
             var pushR2 = PUSH_R * PUSH_R;
 
             for (i = 0; i < systems.length; i++) {
@@ -825,7 +828,7 @@
             // tether the nearest bodies to the cursor, so the hover reads as a
             // response instead of the pattern drifting past untouched
             if (animated && pointer.active) {
-                ctx.strokeStyle = line;
+                ctx.strokeStyle = ink;
                 ctx.lineWidth = 1;
                 var linked = 0;
                 var linkR2 = LINK_R * LINK_R;
@@ -914,257 +917,6 @@
         }
     });
 
-    /* --------------------------------------------------------------------
-       GLASS BUBBLE — draggable orb with velocity and edge bounce
-       Ported from Bencho glass-bubble
-       ------------------------------------------------------------------ */
-    component("glass-bubble", function () {
-        var bubble = document.querySelector("[data-bubble]");
-        if (!bubble) return;
-
-        // 0.92 decays a full-strength throw to rest in about a second; at 0.94
-        // the orb kept sliding for closer to two, which read as floaty
-        var FRICTION = 0.92;
-        var BOUNCE = 0.55;
-        var MAX_THROW = 24;
-        var SQUASH = 0.55; // how much of the speed becomes deformation
-
-        var x = 0;
-        var y = 0;
-        var vx = 0;
-        var vy = 0;
-        var scaleX = 1;
-        var scaleY = 1;
-        var isDragging = false;
-        var pointerId = null;
-        var lastX = 0;
-        var lastY = 0;
-        var lastT = 0;
-        var grabX = 0;
-        var grabY = 0;
-        var rafId = null;
-        var minX = 0;
-        var minY = 0;
-        var maxX = 0;
-        var maxY = 0;
-
-        function measure() {
-            var host = bubble.offsetParent || bubble.parentNode;
-            if (!host) return;
-
-            var hostRect = host.getBoundingClientRect();
-            var w = bubble.offsetWidth || 1;
-            var h = bubble.offsetHeight || 1;
-
-            // The bubble is parked, not laid out, so its resting spot has to
-            // find genuinely empty space: beside the slide-to-confirm when
-            // there is room for it, otherwise in the section's bottom padding.
-            var anchor = host.querySelector(".slide__track");
-            var restX;
-            var restY;
-
-            if (anchor) {
-                var ar = anchor.getBoundingClientRect();
-                var slot = hostRect.width - (ar.right - hostRect.left) - 24;
-                if (slot >= w + 16) {
-                    restX = ar.right - hostRect.left + 40;
-                    restY = ar.top - hostRect.top + (ar.height - h) / 2;
-                } else {
-                    restX = (hostRect.width - w) / 2;
-                    restY = hostRect.height - h - 12;
-                }
-            } else {
-                restX = (hostRect.width - w) / 2;
-                restY = 12;
-            }
-
-            restX = clamp(restX, 8, Math.max(8, hostRect.width - w - 8));
-            restY = clamp(restY, 8, Math.max(8, hostRect.height - h - 8));
-
-            bubble.style.setProperty("--bubble-left", restX.toFixed(1) + "px");
-            bubble.style.setProperty("--bubble-top", restY.toFixed(1) + "px");
-
-            // x and y are offsets from the resting spot, so the travel limits
-            // have to be expressed in the same space or the bubble escapes the
-            // section. Left and up are capped short so it cannot wander over
-            // the slide-to-confirm text.
-            var pad = 12;
-            var limitX = Math.max(0, hostRect.width - w - pad);
-            var limitY = Math.max(0, hostRect.height - h - pad);
-            minX = -Math.min(restX, 90);
-            minY = -Math.min(restY, 70);
-            maxX = Math.max(minX, limitX - restX);
-            maxY = Math.max(minY, limitY - restY);
-        }
-
-        function apply() {
-            bubble.style.transform =
-                "translate3d(" +
-                x.toFixed(2) +
-                "px," +
-                y.toFixed(2) +
-                "px,0) scale(" +
-                scaleX.toFixed(3) +
-                "," +
-                scaleY.toFixed(3) +
-                ")";
-        }
-
-        function settle() {
-            if (reduceMotion.matches) {
-                scaleX = 1;
-                scaleY = 1;
-                return;
-            }
-            // springs the squash back to a circle
-            scaleX += (1 - scaleX) * 0.18;
-            scaleY += (1 - scaleY) * 0.18;
-        }
-
-        function tick() {
-            if (!isDragging) {
-                x += vx;
-                y += vy;
-                vx *= FRICTION;
-                vy *= FRICTION;
-
-                if (x < minX) {
-                    x = minX;
-                    vx = -vx * BOUNCE;
-                } else if (x > maxX) {
-                    x = maxX;
-                    vx = -vx * BOUNCE;
-                }
-                if (y < minY) {
-                    y = minY;
-                    vy = -vy * BOUNCE;
-                } else if (y > maxY) {
-                    y = maxY;
-                    vy = -vy * BOUNCE;
-                }
-                if (Math.abs(vx) < 0.05) vx = 0;
-                if (Math.abs(vy) < 0.05) vy = 0;
-
-                settle();
-
-                var resting =
-                    vx === 0 &&
-                    vy === 0 &&
-                    Math.abs(scaleX - 1) < 0.002 &&
-                    Math.abs(scaleY - 1) < 0.002;
-                if (resting) {
-                    scaleX = 1;
-                    scaleY = 1;
-                    apply();
-                    rafId = null;
-                    return;
-                }
-            } else {
-                settle();
-            }
-
-            apply();
-            rafId = requestAnimationFrame(tick);
-        }
-
-        function wake() {
-            if (rafId === null) rafId = requestAnimationFrame(tick);
-        }
-
-        // start in the layout position, then measure against it
-        measure();
-        apply();
-
-        var resizeRaf = null;
-        function scheduleMeasure() {
-            if (resizeRaf) cancelAnimationFrame(resizeRaf);
-            resizeRaf = requestAnimationFrame(function () {
-                measure();
-                x = clamp(x, minX, maxX);
-                y = clamp(y, minY, maxY);
-                apply();
-            });
-        }
-        window.addEventListener("resize", scheduleMeasure);
-
-        bubble.addEventListener("pointerdown", function (e) {
-            if (e.pointerType === "mouse" && e.button !== 0) return;
-            isDragging = true;
-            pointerId = e.pointerId;
-            bubble.setPointerCapture(pointerId);
-            bubble.classList.add("is-dragging");
-            vx = 0;
-            vy = 0;
-            lastX = e.clientX;
-            lastY = e.clientY;
-            lastT = performance.now();
-            // the offset is re-derived every move, so a scale in flight at
-            // grab time cannot multiply the pointer delta
-            grabX = e.clientX - x;
-            grabY = e.clientY - y;
-            wake();
-        });
-
-        bubble.addEventListener("pointermove", function (e) {
-            if (!isDragging || e.pointerId !== pointerId) return;
-            e.preventDefault();
-
-            var now = performance.now();
-            var dx = e.clientX - lastX;
-            var dy = e.clientY - lastY;
-            var dt = now - lastT;
-
-            x = e.clientX - grabX;
-            y = e.clientY - grabY;
-            // clamp while held, not only on release: otherwise the orb can be
-            // dragged out of bounds and then visibly snaps back when let go
-            x = clamp(x, minX, maxX);
-            y = clamp(y, minY, maxY);
-            grabX = e.clientX - x;
-            grabY = e.clientY - y;
-
-            if (dt > 0) {
-                vx = clamp((dx / dt) * 16.67, -MAX_THROW, MAX_THROW);
-                vy = clamp((dy / dt) * 16.67, -MAX_THROW, MAX_THROW);
-
-                // squash along the drag axis, stretch across it
-                var mag = clamp(Math.sqrt(vx * vx + vy * vy) / MAX_THROW, 0, 1);
-                var stretch = 1 + mag * SQUASH * 0.5;
-                var squash = 1 - mag * SQUASH * 0.5;
-                if (reduceMotion.matches) {
-                    scaleX = 1;
-                    scaleY = 1;
-                } else if (Math.abs(vx) >= Math.abs(vy)) {
-                    scaleX = stretch;
-                    scaleY = squash;
-                } else {
-                    scaleX = squash;
-                    scaleY = stretch;
-                }
-            }
-
-            lastX = e.clientX;
-            lastY = e.clientY;
-            lastT = now;
-            wake();
-        });
-
-        function endDrag(e) {
-            if (!isDragging || (e && e.pointerId !== pointerId)) return;
-            isDragging = false;
-            pointerId = null;
-            bubble.classList.remove("is-dragging");
-            // no throw, no bounce, no rebound: the orb just stays put
-            if (reduceMotion.matches) {
-                vx = 0;
-                vy = 0;
-            }
-            wake();
-        }
-
-        bubble.addEventListener("pointerup", endDrag);
-        bubble.addEventListener("pointercancel", endDrag);
-    });
 
     /* --------------------------------------------------------------------
        CAROUSEL — snap scroller with drag, dots and buttons
@@ -2327,5 +2079,43 @@
 
             if (history.replaceState) history.replaceState(null, "", hash);
         });
+    });
+
+    component("gradual-blur", function () {
+        var band = document.createElement("div");
+        band.className = "gradual-blur gradual-blur--page";
+        band.setAttribute("aria-hidden", "true");
+        document.body.appendChild(band);
+
+        // reactbits config: divCount 5, height 7rem (css), strength 2,
+        // curve bezier, exponential ramp, opacity 1
+        var count = 5;
+        var strength = 2;
+        var opacity = 1;
+        for (var i = 1; i <= count; i++) {
+            var p = i / count;
+            p = p * p * (3 - 2 * p); // bezier curve
+            var blurR = 0.0625 * (p * count + 1) * strength;
+            var inc = 100 / count;
+            var p1 = Math.round((inc * i - inc) * 10) / 10;
+            var p2 = Math.round(inc * i * 10) / 10;
+            var p3 = Math.round((inc * i + inc) * 10) / 10;
+            var p4 = Math.round((inc * i + inc * 2) * 10) / 10;
+            var g = "transparent " + p1 + "%, #000 " + p2 + "%";
+            if (p3 <= 100) g += ", #000 " + p3 + "%";
+            if (p4 <= 100) g += ", transparent " + p4 + "%";
+            var layer = document.createElement("div");
+            layer.className = "gradual-blur__layer";
+            layer.style.backdropFilter = "blur(" + blurR.toFixed(3) + "rem)";
+            layer.style.webkitBackdropFilter = "blur(" + blurR.toFixed(3) + "rem)";
+            layer.style.maskImage = "linear-gradient(to bottom, " + g + ")";
+            layer.style.webkitMaskImage = "linear-gradient(to bottom, " + g + ")";
+            layer.style.opacity = String(opacity);
+            band.appendChild(layer);
+        }
+
+        window.setTimeout(function () {
+            band.classList.add("is-on");
+        }, 60);
     });
 }());

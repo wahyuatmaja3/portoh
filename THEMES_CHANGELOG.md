@@ -14,7 +14,7 @@ dari Bencho ditambahkan.
 | `--accent` | `#d6ff3f` → **`#ff7a1a`** | `#4b32e0` → **`#c2410c`** |
 | `--accent-ink` | baru | baru |
 | `--accent-soft` | baru | baru |
-| `--accent-line` | baru | baru |
+| `--particle-ink` | baru | baru |
 
 `prism` **tidak** memakai `#ff7a1a` yang sama seperti `obsidian`. Accent terang
 yang lolos di atas `#08080a` (7.67:1) gagal di atas `#f4f2ed` (2.33:1 — di bawah
@@ -26,8 +26,15 @@ Token baru:
 - `--accent-ink` — warna teks di atas permukaan accent. `#1a0d02` di `obsidian`
   (7.30:1), `#ffffff` di `prism` (5.18:1).
 - `--accent-soft` — fill accent transparan, untuk chip dan hover.
-- `--accent-line` — stroke accent, dipakai canvas particle dan border dekoratif
-  supaya warna partikel tetap mengikuti tema tanpa palet JS terpisah.
+- `--particle-ink` — tinta canvas particle. Diterapkan sebagai properti `color`
+  biasa pada canvas, dan JS menggambar dengan computed `color` milik canvas itu
+  sendiri, bukan membaca nama token dari `:root`. Jadi JS tidak tahu token mana
+  pun, dan tema bisa mengganti tinta field tanpa menyentuh `main.js`.
+
+Awalnya ada token `--accent-line` untuk warna stroke particle. Token itu
+dihapus: stroke lintasan orbit sekarang memakai tinta yang sama dengan
+`globalAlpha` yang lebih rendah, jadi satu warna cukup untuk dua tingkat visual
+dan tidak perlu palet terpisah di CSS maupun di JS.
 
 Wash `prism` juga diubah dari iridescent (ungu/magenta/teal) menjadi warm paper,
 agar konsisten dengan aksen oranye.
@@ -35,9 +42,9 @@ agar konsisten dengan aksen oranye.
 ### Komponen baru
 
 - `particles` — dua sistem orbit di belakang hero (inti + 4 cincin konsentris,
-  82 badan), warna dari token accent. Cincin dalam paling cepat dan padat, luar
-  paling lambat dan jarang. Cursor mendorong badan lalu/spring balik ke orbit.
-- `glass-bubble` — orb glass draggable di section contact.
+  82 badan), warnanya diambil dari `color` canvas sendiri sehingga tema yang
+  menentukan tinta field ini. Cincin dalam paling cepat dan padat, luar
+  paling lambat dan jarang. Cursor mendorong badan lalu spring balik ke orbit.
 - `carousel` — 5 slide proses, section `#process` baru di antara Work dan Contact.
 
 ### Sweep kontras
@@ -50,10 +57,7 @@ agar konsisten dengan aksen oranye.
 
 ### Reduced motion
 
-Field particle disembunyikan total (bergerak sendiri). Glass bubble justru
-**tetap terlihat dan tetap bisa di-drag** — drag adalah gerakan yang dipicu
-pengguna, bukan animasi otomatis — tapi squash, momentum, bounce, dan transisi
-dimatikan sehingga orb hanya mengikuti pointer.
+Field particle disembunyikan total (bergerak sendiri).
 
 ---
 
