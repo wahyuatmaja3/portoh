@@ -649,6 +649,79 @@ ol {
    carries the particle palette through ordinary cascade. The stroke weights
    below reuse the same ink at lower alpha, which is why there is no separate
    line token. */
+
+/* The wordmark reaches past where the page scrim fades out, so it carries its
+   own pool of background. Anchored to the heading box, which means it tracks
+   the type at every viewport instead of relying on a fixed percentage.
+   perspective on the heading already establishes a stacking context, so this
+   negative z-index stays behind the glyphs and above the particle canvas,
+   which sits at the same depth one level up. */
+.hero__title[data-tech-text]::before {
+    content: "";
+    position: absolute;
+    inset: -26% -10% -30% -12%;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(
+        ellipse 68% 96% at 42% 50%,
+        var(--bg) 0%,
+        color-mix(in srgb, var(--bg) 88%, transparent) 42%,
+        color-mix(in srgb, var(--bg) 46%, transparent) 66%,
+        transparent 86%
+    );
+}
+
+/* The remaining hero copy gets the same treatment as the wordmark: a pool of
+   background anchored to each block, so the protection tracks the text at
+   every viewport instead of depending on a gradient that has to be tuned
+   against six different rectangles.
+   isolation is what keeps each pool inside its own block. It is also why the
+   absolutely positioned .availability__pulse::after still resolves against
+   .availability__pulse and not against the new containing block. */
+.availability,
+.hero__roles,
+.hero__desc,
+.hero__facts,
+.hero__actions {
+    position: relative;
+    isolation: isolate;
+}
+
+.availability::before,
+.hero__roles::before,
+.hero__desc::before,
+.hero__facts::before,
+.hero__actions::before {
+    content: "";
+    position: absolute;
+    inset: -70% -9% -80% -9%;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(
+        ellipse 70% 100% at 50% 50%,
+        var(--bg) 0%,
+        color-mix(in srgb, var(--bg) 90%, transparent) 44%,
+        color-mix(in srgb, var(--bg) 52%, transparent) 72%,
+        transparent 94%
+    );
+}
+
+@media (width < 52rem) {
+    /* The heading box is far wider than it is tall here, so its pool of
+       background has to be taller than the default one to reach the
+       letterforms at both ends of the word. */
+    .hero__title[data-tech-text]::before {
+        inset: -62% -8% -74% -8%;
+        background: radial-gradient(
+            ellipse 74% 100% at 45% 50%,
+            var(--bg) 0%,
+            color-mix(in srgb, var(--bg) 92%, transparent) 46%,
+            color-mix(in srgb, var(--bg) 58%, transparent) 72%,
+            transparent 92%
+        );
+    }
+}
+
 .hero__particles {
     position: absolute;
     inset: 0;
