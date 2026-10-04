@@ -1251,7 +1251,7 @@
         // stack read as a disc seen at an angle.
         var COS_T = Math.cos(ORBIT_TILT);
         var SIN_T = Math.sin(ORBIT_TILT);
-        var CORE_R = 2.6;
+        var CORE_R = 2.9;
         var PUSH_R = 90; // how far the cursor can shove a body off its orbit
         var LINK_R = 150; // cursor tether reach
 
@@ -1260,10 +1260,10 @@
         // the way a real system thins out. Inner rings run faster, so the whole
         // system shears instead of rotating as one rigid disc.
         var RINGS = [
-            { r: 0.3, n: 5, speed: 1.0, dot: 1.5 },
-            { r: 0.56, n: 8, speed: 0.62, dot: 1.3 },
-            { r: 0.8, n: 10, speed: 0.4, dot: 1.1 },
-            { r: 1.0, n: 13, speed: 0.27, dot: 0.95 }
+            { r: 0.3, n: 5, speed: 1.0, dot: 1.7 },
+            { r: 0.56, n: 8, speed: 0.62, dot: 1.5 },
+            { r: 0.8, n: 10, speed: 0.4, dot: 1.25 },
+            { r: 1.0, n: 13, speed: 0.27, dot: 1.1 }
         ];
         var CORE_BODIES = 5;
 
@@ -1410,7 +1410,7 @@
                 s = systems[i];
                 for (j = 0; j < s.rings.length; j++) {
                     ring = s.rings[j];
-                    ctx.globalAlpha = 0.17 - j * 0.024;
+                    ctx.globalAlpha = 0.3 - j * 0.035;
                     ctx.beginPath();
                     ctx.ellipse(s.cx, s.cy, ring.rx, ring.ry, ORBIT_TILT, 0, Math.PI * 2);
                     ctx.stroke();
