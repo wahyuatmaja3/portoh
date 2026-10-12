@@ -2113,19 +2113,118 @@
         var nav = document.getElementById("nav");
         if (!nav) return;
 
+        var indicator = document.getElementById("navIndicator");
+        var navLinks = document.getElementById("navLinks");
+        var mobileToggle = document.getElementById("navMobileToggle");
+        var mobileMenu = document.getElementById("navMobileMenu");
+        var desktopLinks = Array.prototype.slice.call(nav.querySelectorAll("[data-nav-link]"));
+        var mobileLinks = Array.prototype.slice.call(nav.querySelectorAll("[data-mobile-link]"));
+
+        var activeLink = null;
         var lastY = window.scrollY;
         var ticking = false;
 
+        // Sliding indicator calculation
+        function updateIndicator(targetEl) {
+            if (!indicator || !navLinks) return;
+            if (!targetEl || !navLinks.contains(targetEl)) {
+                indicator.style.opacity = "0";
+                return;
+            }
+            var linksRect = navLinks.getBoundingClientRect();
+            var targetRect = targetEl.getBoundingClientRect();
+            var left = targetRect.left - linksRect.left;
+            var width = targetRect.width;
+
+            indicator.style.transform = "translateX(" + left + "px)";
+            indicator.style.width = width + "px";
+            indicator.style.opacity = "1";
+        }
+
+        // Hover preview for indicator
+        if (navLinks) {
+            desktopLinks.forEach(function (link) {
+                link.addEventListener("pointerenter", function () {
+                    updateIndicator(link);
+                });
+            });
+            navLinks.addEventListener("pointerleave", function () {
+                updateIndicator(activeLink);
+            });
+        }
+
+        // Window resize keeps indicator aligned with target element
+        window.addEventListener("resize", function () {
+            if (activeLink) {
+                updateIndicator(activeLink);
+            } else if (indicator) {
+                indicator.style.opacity = "0";
+            }
+        });
+
+        // Mobile drawer toggle & dismiss handlers
+        function setMobileMenu(open) {
+            nav.classList.toggle("is-open", open);
+            if (mobileToggle) {
+                mobileToggle.setAttribute("aria-expanded", String(open));
+            }
+            if (mobileMenu) {
+                mobileMenu.setAttribute("aria-hidden", String(!open));
+            }
+        }
+
+        if (mobileToggle) {
+            mobileToggle.addEventListener("click", function (e) {
+                e.stopPropagation();
+                var isOpen = nav.classList.contains("is-open");
+                setMobileMenu(!isOpen);
+            });
+        }
+
+        mobileLinks.forEach(function (link) {
+            link.addEventListener("click", function () {
+                setMobileMenu(false);
+            });
+        });
+
+        document.addEventListener("click", function (e) {
+            if (nav.classList.contains("is-open") && !nav.contains(e.target)) {
+                setMobileMenu(false);
+            }
+        });
+
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape" && nav.classList.contains("is-open")) {
+                setMobileMenu(false);
+                if (mobileToggle) mobileToggle.focus();
+            }
+        });
+
+        // Sticky dock & hide on scroll down
         function onScroll() {
             var y = window.scrollY;
             nav.classList.toggle("is-stuck", y > 24);
 
-            // never hide while a child has focus, otherwise keyboard users
-            // are stranded on an off-screen element
             var focused = nav.contains(document.activeElement);
+            var isMenuOpen = nav.classList.contains("is-open");
 
-            if (!focused && y > 240 && y > lastY + 4) nav.classList.add("is-hidden");
-            else if (y < lastY - 4 || y < 240) nav.classList.remove("is-hidden");
+            if (!focused && !isMenuOpen && y > 240 && y > lastY + 4) {
+                nav.classList.add("is-hidden");
+            } else if (y < lastY - 4 || y < 240 || isMenuOpen) {
+                nav.classList.remove("is-hidden");
+            }
+
+            // At top hero section, clear active highlights
+            if (y < 200) {
+                activeLink = null;
+                desktopLinks.forEach(function (a) {
+                    a.classList.remove("is-active");
+                });
+                mobileLinks.forEach(function (a) {
+                    a.classList.remove("is-active");
+                });
+                if (indicator) indicator.style.opacity = "0";
+            }
 
             lastY = y;
             ticking = false;
@@ -2140,15 +2239,14 @@
             },
             { passive: true }
         );
-        // bring it back if focus lands inside while it is hidden
+
         nav.addEventListener("focusin", function () {
             nav.classList.remove("is-hidden");
         });
         onScroll();
 
-        // active link based on which section is in view
-        var links = document.querySelectorAll("[data-nav-link]");
-        var sections = Array.prototype.map.call(links, function (a) {
+        // Active section observer
+        var sections = desktopLinks.map(function (a) {
             return document.querySelector(a.getAttribute("href"));
         });
 
@@ -2159,9 +2257,16 @@
                         if (!entry.isIntersecting) return;
                         var idx = sections.indexOf(entry.target);
                         if (idx === -1) return;
-                        links.forEach(function (a, i) {
+
+                        desktopLinks.forEach(function (a, i) {
                             a.classList.toggle("is-active", i === idx);
                         });
+                        mobileLinks.forEach(function (a, i) {
+                            a.classList.toggle("is-active", i === idx);
+                        });
+
+                        activeLink = desktopLinks[idx] || null;
+                        updateIndicator(activeLink);
                     });
                 },
                 { rootMargin: "-45% 0px -50% 0px" }

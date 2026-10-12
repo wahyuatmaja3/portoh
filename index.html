@@ -82,17 +82,48 @@
 
         <!-- ======= NAVBAR ======= -->
         <header class="nav" id="nav">
-            <div class="nav__inner">
+            <div class="nav__dock">
                 <a class="nav__logo cursor-target" href="#hero" data-magnetic>
                     <span class="nav__logo-mark">WTA<span class="accent">.</span></span>
                 </a>
 
-                <nav class="nav__links" aria-label="Sections">
-                    <a class="cursor-target" href="#about" data-nav-link><span>01</span> About</a>
-                    <a class="cursor-target" href="#skills" data-nav-link><span>02</span> Skills</a>
-                    <a class="cursor-target" href="#projects" data-nav-link><span>03</span> Work</a>
-                    <a class="cursor-target" href="#process" data-nav-link><span>04</span> Process</a>
-                    <a class="cursor-target" href="#contact" data-nav-link><span>05</span> Contact</a>
+                <nav class="nav__links" id="navLinks" aria-label="Sections">
+                    <span class="nav__indicator" id="navIndicator" aria-hidden="true"></span>
+                    <a class="nav__item cursor-target" href="#about" data-nav-link>
+                        <span class="nav__roll" aria-hidden="true">
+                            <span class="nav__roll-label">About</span>
+                            <span class="nav__roll-label nav__roll-label--hover">About</span>
+                        </span>
+                        <span class="sr-only">About</span>
+                    </a>
+                    <a class="nav__item cursor-target" href="#skills" data-nav-link>
+                        <span class="nav__roll" aria-hidden="true">
+                            <span class="nav__roll-label">Skills</span>
+                            <span class="nav__roll-label nav__roll-label--hover">Skills</span>
+                        </span>
+                        <span class="sr-only">Skills</span>
+                    </a>
+                    <a class="nav__item cursor-target" href="#projects" data-nav-link>
+                        <span class="nav__roll" aria-hidden="true">
+                            <span class="nav__roll-label">Work</span>
+                            <span class="nav__roll-label nav__roll-label--hover">Work</span>
+                        </span>
+                        <span class="sr-only">Work</span>
+                    </a>
+                    <a class="nav__item cursor-target" href="#process" data-nav-link>
+                        <span class="nav__roll" aria-hidden="true">
+                            <span class="nav__roll-label">Process</span>
+                            <span class="nav__roll-label nav__roll-label--hover">Process</span>
+                        </span>
+                        <span class="sr-only">Process</span>
+                    </a>
+                    <a class="nav__item cursor-target" href="#contact" data-nav-link>
+                        <span class="nav__roll" aria-hidden="true">
+                            <span class="nav__roll-label">Contact</span>
+                            <span class="nav__roll-label nav__roll-label--hover">Contact</span>
+                        </span>
+                        <span class="sr-only">Contact</span>
+                    </a>
                 </nav>
 
                 <div class="nav__actions">
@@ -128,7 +159,22 @@
                         </span>
                         <span class="sr-only" id="themeToggleState">Current theme: Obsidian</span>
                     </button>
+
+                    <button class="nav__mobile-toggle cursor-target" id="navMobileToggle" type="button" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="navMobileMenu">
+                        <span class="nav__mobile-line" aria-hidden="true"></span>
+                        <span class="nav__mobile-line" aria-hidden="true"></span>
+                    </button>
                 </div>
+            </div>
+
+            <div class="nav__mobile-popover" id="navMobileMenu" aria-hidden="true">
+                <nav class="nav__mobile-list" aria-label="Mobile sections">
+                    <a class="nav__mobile-link cursor-target" href="#about" data-mobile-link>About</a>
+                    <a class="nav__mobile-link cursor-target" href="#skills" data-mobile-link>Skills</a>
+                    <a class="nav__mobile-link cursor-target" href="#projects" data-mobile-link>Work</a>
+                    <a class="nav__mobile-link cursor-target" href="#process" data-mobile-link>Process</a>
+                    <a class="nav__mobile-link cursor-target" href="#contact" data-mobile-link>Contact</a>
+                </nav>
             </div>
         </header>
 
@@ -210,33 +256,62 @@
                     </header>
 
                     <div class="about">
-                        <div class="about__lede" data-reveal>
-                            <p>
-                                Mobile &amp; Desktop Developer dari Surabaya dengan 3+ tahun
-                                pengalaman profesional.
-                            </p>
-                            <p>
-                                Saya fokus pada pengembangan aplikasi mobile menggunakan
-                                <em>Flutter</em> dan maintenance sistem desktop dengan
-                                <em>Delphi</em>. Passionate tentang clean code dan user
-                                experience.
-                            </p>
+                        <div class="about__media" data-reveal>
+                            <div class="about__card cursor-target" data-tilt data-tilt-glare>
+                                <div class="about__card-glare" aria-hidden="true"></div>
+                                <div class="about__image-frame">
+                                    <img
+                                        class="about__photo"
+                                        src="me.png"
+                                        alt="Wahyu Tri Atmaja — Flutter Engineer"
+                                        width="600"
+                                        height="800"
+                                        loading="lazy"
+                                        decoding="async"
+                                    >
+                                </div>
+                                <div class="about__card-overlay">
+                                    <div class="about__status-chip">
+                                        <span class="about__status-dot" aria-hidden="true"></span>
+                                        <span>Surabaya, ID</span>
+                                    </div>
+                                    <div class="about__card-badge">
+                                        <span class="about__badge-role">Mobile &amp; Desktop</span>
+                                        <span class="about__badge-exp">3+ YOE</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="about__body" data-reveal>
-                            <p>
-                                Setelah lulus SMK jurusan Rekayasa Perangkat Lunak, saya
-                                bergabung di sebuah software house di Surabaya. Tahun ketiga
-                                saya memegang tanggung jawab penuh untuk program mobile app
-                                baru yang sedang dikembangkan, sekaligus memelihara
-                                program desktop lama yang sudah berjalan dalam pemakaian
-                                harian.
-                            </p>
-                            <p>
-                                Dua peran itu membentuk cara kerja saya: iterasi cepat untuk
-                                fitur baru, dan debugging yang teliti untuk sistem yang
-                                tidak boleh down.
-                            </p>
+                        <div class="about__content">
+                            <div class="about__lede" data-reveal>
+                                <p>
+                                    Mobile &amp; Desktop Developer dari Surabaya dengan 3+ tahun
+                                    pengalaman profesional.
+                                </p>
+                                <p>
+                                    Saya fokus pada pengembangan aplikasi mobile menggunakan
+                                    <em>Flutter</em> dan maintenance sistem desktop dengan
+                                    <em>Delphi</em>. Passionate tentang clean code dan user
+                                    experience.
+                                </p>
+                            </div>
+
+                            <div class="about__body" data-reveal>
+                                <p>
+                                    Setelah lulus SMK jurusan Rekayasa Perangkat Lunak, saya
+                                    bergabung di sebuah software house di Surabaya. Tahun ketiga
+                                    saya memegang tanggung jawab penuh untuk program mobile app
+                                    baru yang sedang dikembangkan, sekaligus memelihara
+                                    program desktop lama yang sudah berjalan dalam pemakaian
+                                    harian.
+                                </p>
+                                <p>
+                                    Dua peran itu membentuk cara kerja saya: iterasi cepat untuk
+                                    fitur baru, dan debugging yang teliti untuk sistem yang
+                                    tidak boleh down.
+                                </p>
+                            </div>
                         </div>
                     </div>
 
