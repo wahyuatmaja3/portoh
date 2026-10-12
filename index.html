@@ -63,6 +63,16 @@
                     />
                     <feBlend in="SourceGraphic" in2="goo" />
                 </filter>
+                <filter id="gooey-nav">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
+                    <feColorMatrix
+                        in="blur"
+                        mode="matrix"
+                        values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -9"
+                        result="goo"
+                    />
+                    <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+                </filter>
             </defs>
         </svg>
 
@@ -88,7 +98,11 @@
                 </a>
 
                 <nav class="nav__links" id="navLinks" aria-label="Sections">
-                    <span class="nav__indicator" id="navIndicator" aria-hidden="true"></span>
+                    <div class="nav__gooey" id="navGooey" aria-hidden="true">
+                        <span class="nav__blob nav__blob--pill" id="navBlobPill"></span>
+                        <span class="nav__blob nav__blob--trail" id="navBlobTrail"></span>
+                        <span class="nav__blob nav__blob--lead" id="navBlobLead"></span>
+                    </div>
                     <a class="nav__item cursor-target" href="#about" data-nav-link>
                         <span class="nav__roll" aria-hidden="true">
                             <span class="nav__roll-label">About</span>

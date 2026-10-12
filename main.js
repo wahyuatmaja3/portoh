@@ -2113,8 +2113,11 @@
         var nav = document.getElementById("nav");
         if (!nav) return;
 
-        var indicator = document.getElementById("navIndicator");
         var navLinks = document.getElementById("navLinks");
+        var navGooey = document.getElementById("navGooey");
+        var blobPill = document.getElementById("navBlobPill");
+        var blobTrail = document.getElementById("navBlobTrail");
+        var blobLead = document.getElementById("navBlobLead");
         var mobileToggle = document.getElementById("navMobileToggle");
         var mobileMenu = document.getElementById("navMobileMenu");
         var desktopLinks = Array.prototype.slice.call(nav.querySelectorAll("[data-nav-link]"));
@@ -2124,24 +2127,116 @@
         var lastY = window.scrollY;
         var ticking = false;
 
-        // Sliding indicator calculation
-        function updateIndicator(targetEl) {
-            if (!indicator || !navLinks) return;
-            if (!targetEl || !navLinks.contains(targetEl)) {
-                indicator.style.opacity = "0";
+        // Spring physics state for gooey liquid effect
+        var currentX = 0;
+        var currentW = 0;
+        var targetX = 0;
+        var targetW = 0;
+        var vx = 0;
+        var vw = 0;
+        var rafId = null;
+        var isVisible = false;
+
+        function animateGooey() {
+            // Spring physics parameters
+            var k = 0.18; // stiffness
+            var d = 0.76; // damping
+
+            var fx = (targetX - currentX) * k;
+            vx = (vx + fx) * d;
+            currentX += vx;
+
+            var fw = (targetW - currentW) * k;
+            vw = (vw + fw) * d;
+            currentW += vw;
+
+            // Velocity stretch factor for gooey metaball deformation
+            var stretch = Math.min(Math.abs(vx) * 0.45, 18);
+            var dir = vx >= 0 ? 1 : -1;
+            var pillWidth = Math.max(currentW + stretch * 0.6, 20);
+            var pillOffset = currentX - (dir > 0 ? stretch * 0.2 : stretch * 0.4);
+
+            if (blobPill) {
+                blobPill.style.transform = "translate3d(" + pillOffset.toFixed(2) + "px, 0, 0)";
+                blobPill.style.width = pillWidth.toFixed(2) + "px";
+            }
+
+            // Droplet bubbles appear when moving fast enough (> 1.2px/frame)
+            var speed = Math.abs(vx);
+            if (speed > 1.2 && !reduceMotion.matches) {
+                if (blobTrail) {
+                    var trailOffset = currentX - dir * (Math.min(speed * 3.8, 38) + 4);
+                    blobTrail.style.transform = "translate3d(" + trailOffset.toFixed(2) + "px, 0, 0) scale(" + Math.min(0.4 + speed * 0.05, 0.95).toFixed(2) + ")";
+                    blobTrail.style.opacity = Math.min(speed * 0.16, 0.9).toFixed(2);
+                }
+                if (blobLead) {
+                    var leadOffset = currentX + currentW + dir * Math.min(speed * 2.5, 24);
+                    blobLead.style.transform = "translate3d(" + leadOffset.toFixed(2) + "px, 0, 0) scale(" + Math.min(0.35 + speed * 0.04, 0.85).toFixed(2) + ")";
+                    blobLead.style.opacity = Math.min(speed * 0.14, 0.8).toFixed(2);
+                }
+            } else {
+                if (blobTrail) blobTrail.style.opacity = "0";
+                if (blobLead) blobLead.style.opacity = "0";
+            }
+
+            // Settle threshold
+            if (Math.abs(targetX - currentX) < 0.15 && Math.abs(vx) < 0.15 &&
+                Math.abs(targetW - currentW) < 0.15 && Math.abs(vw) < 0.15) {
+                currentX = targetX;
+                currentW = targetW;
+                vx = 0;
+                vw = 0;
+                if (blobPill) {
+                    blobPill.style.transform = "translate3d(" + currentX.toFixed(2) + "px, 0, 0)";
+                    blobPill.style.width = currentW.toFixed(2) + "px";
+                }
+                if (blobTrail) blobTrail.style.opacity = "0";
+                if (blobLead) blobLead.style.opacity = "0";
+                rafId = null;
                 return;
             }
-            var linksRect = navLinks.getBoundingClientRect();
-            var targetRect = targetEl.getBoundingClientRect();
-            var left = targetRect.left - linksRect.left;
-            var width = targetRect.width;
 
-            indicator.style.transform = "translateX(" + left + "px)";
-            indicator.style.width = width + "px";
-            indicator.style.opacity = "1";
+            rafId = requestAnimationFrame(animateGooey);
         }
 
-        // Hover preview for indicator
+        function updateIndicator(targetEl, immediate) {
+            if (!navGooey || !navLinks) return;
+            if (!targetEl || !navLinks.contains(targetEl)) {
+                navGooey.style.opacity = "0";
+                isVisible = false;
+                return;
+            }
+
+            var linksRect = navLinks.getBoundingClientRect();
+            var targetRect = targetEl.getBoundingClientRect();
+            targetX = targetRect.left - linksRect.left;
+            targetW = targetRect.width;
+
+            if (!isVisible || immediate || reduceMotion.matches) {
+                currentX = targetX;
+                currentW = targetW;
+                vx = 0;
+                vw = 0;
+                if (blobPill) {
+                    blobPill.style.transform = "translate3d(" + currentX.toFixed(2) + "px, 0, 0)";
+                    blobPill.style.width = currentW.toFixed(2) + "px";
+                }
+                if (blobTrail) blobTrail.style.opacity = "0";
+                if (blobLead) blobLead.style.opacity = "0";
+                navGooey.style.opacity = "1";
+                isVisible = true;
+                return;
+            }
+
+            navGooey.style.opacity = "1";
+            isVisible = true;
+
+            if (!rafId) {
+                rafId = requestAnimationFrame(animateGooey);
+            }
+        }
+
+        // Hover preview for gooey indicator
         if (navLinks) {
             desktopLinks.forEach(function (link) {
                 link.addEventListener("pointerenter", function () {
@@ -2156,9 +2251,10 @@
         // Window resize keeps indicator aligned with target element
         window.addEventListener("resize", function () {
             if (activeLink) {
-                updateIndicator(activeLink);
-            } else if (indicator) {
-                indicator.style.opacity = "0";
+                updateIndicator(activeLink, true);
+            } else if (navGooey) {
+                navGooey.style.opacity = "0";
+                isVisible = false;
             }
         });
 
